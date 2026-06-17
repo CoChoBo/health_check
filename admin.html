@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>건강 점수 관리자</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  padding:20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.section {
+  margin-top:30px;
+}
+
+.section h3 {
+  margin-bottom:10px;
+}
+
+input {
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:5px;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  background:#0068ff;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button.secondary {
+  background:#444;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th, td {
+  border-bottom:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+
+th {
+  background:#f2f2f2;
+}
+
+.chart-box {
+  margin-top:20px;
+}
+
+ul {
+  padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>📊 건강 점수 관리자 대시보드</h2>
+
+<!-- =======================
+     참여자 요약 (최상단)
+     ======================= -->
+<div class="section">
+  <h3>👥 참여자별 설문 날짜 수</h3>
+  <button onclick="loadNameSummary()">참여도 불러오기</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>설문한 날짜 수</th>
+      </tr>
+    </thead>
+    <tbody id="summaryBody"></tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- =======================
+     이름 검색
+     ======================= -->
+<div class="section">
+  <h3>🔍 이름 검색 (날짜별 최고 점수)</h3>
+
+  <input id="nameInput" placeholder="이름 입력">
+  <button onclick="searchName()">검색</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>날짜</th>
+        <th>총점</th>
+        <th>흡연</th>
+        <th>걸음수</th>
+        <th>LDL</th>
+        <th>혈압</th>
+        <th>BMI</th>
+      </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
+  <button class="secondary" onclick="drawChart()">📈 시각화 (최근 4개)</button>
+
+  <div class="chart-box">
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<hr>
+
+<!-- =======================
+     최근 3일 설문자
+     ======================= -->
+<div class="section">
+  <h3>🕒 최근 3일 설문한 사람</h3>
+  <button onclick="loadRecent()">불러오기</button>
+  <ul id="recentList"></ul>
+</div>
+
+<hr>
+
+<!-- =======================
+     스프레드시트 이동
+     ======================= -->
+<div class="section">
+  <button class="secondary" onclick="openSheet()">📄 Google 스프레드시트 열기</button>
+</div>
+
+</div>
+
+<script>
+const API_BASE = window.location.protocol === "file:"
+  ? "http://127.0.0.1:8000"
+  : "";
+
+
+let currentData = [];
+let chart;
+
+async function getJson(path){
+  const res = await fetch(`${API_BASE}${path}`);
+  const json = await res.json().catch(()=>({}));
+
+  if(!res.ok){
+    throw new Error(json.error || "서버 요청에 실패했습니다");
+  }
+
+  return json;
+}
+
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[ch]));
+}
+
+/* =======================
+   참여자 요약
+   ======================= */
+async function loadNameSummary(){
+  try{
+    const json = await getJson("/api/name-summary");
+    const tbody = document.getElementById("summaryBody");
+    tbody.innerHTML = "";
+
+    if((json.data || []).length === 0){
+      tbody.innerHTML = `<tr><td colspan="2">데이터 없음</td></tr>`;
+      return;
+    }
+
+    json.data.forEach(r=>{
+      tbody.innerHTML += `
+        <tr>
+          <td>${escapeHtml(r.name)}</td>
+          <td><b>${escapeHtml(r.count)}</b></td>
+        </tr>
+      `;
+    });
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+/* =======================
+   이름 검색
+   ======================= */
+async function searchName(){
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name) return alert("이름을 입력하세요");
+
+  try{
+    const json = await getJson(`/api/search-name?name=${encodeURIComponent(name)}`);
+    currentData = json.data || [];
+
+    const tbody = document.getElementById("resultBody");
+    tbody.innerHTML = "";
+
+    if(currentData.length === 0){
+      tbody.innerHTML = `<tr><td colspan="7">데이터 없음</td></tr>`;
+      return;
+    }
+
+    currentData.forEach(r=>{
+      tbody.innerHTML += `
+        <tr>
+          <td>${escapeHtml(r.date)}</td>
+          <td><b>${escapeHtml(r.totalScore)}</b></td>
+          <td>${escapeHtml(r.smoking)}</td>
+          <td>${escapeHtml(r.steps)}</td>
+          <td>${escapeHtml(r.ldl)}</td>
+          <td>${escapeHtml(r.bp)}</td>
+          <td>${escapeHtml(r.bmi)}</td>
+        </tr>
+      `;
+    });
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+/* =======================
+   차트 (최근 4개)
+   ======================= */
+function drawChart(){
+  if(currentData.length === 0){
+    alert("먼저 이름 검색을 하세요");
+    return;
+  }
+
+  const sliced = currentData.slice(-4);
+  const labels = sliced.map(r => r.date.slice(5,10).replace("-", "/"));
+  const scores = sliced.map(r => r.totalScore);
+
+  const ctx = document.getElementById("chart").getContext("2d");
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx,{
+    type:"line",
+    data:{
+      labels,
+      datasets:[{
+        label:"총점",
+        data:scores,
+        borderWidth:2,
+        borderColor:"#0068ff",
+        tension:0.2
+      }]
+    }
+  });
+}
+
+/* =======================
+   최근 3일 설문자
+   ======================= */
+async function loadRecent(){
+  try{
+    const json = await getJson("/api/recent-3days");
+    const ul = document.getElementById("recentList");
+    ul.innerHTML = "";
+
+    if((json.data || []).length === 0){
+      ul.innerHTML = "<li>데이터 없음</li>";
+      return;
+    }
+
+    json.data.forEach(n=>{
+      ul.innerHTML += `<li>${escapeHtml(n)}</li>`;
+    });
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+/* =======================
+   시트 열기
+   ======================= */
+async function openSheet(){
+  try{
+    const json = await getJson("/api/sheet-url");
+    if(!json.url){
+      alert("SHEET_URL이 설정되지 않았습니다");
+      return;
+    }
+    window.open(json.url, "_blank");
+  }catch(err){
+    alert(err.message);
+  }
+}
+</script>
+
+</body>
+</html>

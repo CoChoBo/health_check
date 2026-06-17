@@ -1,0 +1,17 @@
+services:
+  health-check-admin:
+    build: .
+    container_name: health-check-admin
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      DB_PATH: /data/health_check.sqlite3
+      SHEET_URL: ${SHEET_URL:-}
+    volumes:
+      - health-check-data:/data
+
+volumes:
+  health-check-data:

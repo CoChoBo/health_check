@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+.env
+.run-logs/
+health_check.sqlite3
+*.sqlite3
+*.db
+
+data/
+dist/
+build/

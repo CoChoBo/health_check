@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.env
+.git/
+.run-logs/
+health_check.sqlite3
+*.sqlite3
+*.db
+data/
