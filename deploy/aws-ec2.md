@@ -40,15 +40,6 @@ git clone https://github.com/<OWNER>/<REPO>.git
 cd <REPO>
 ```
 
-Google 스프레드시트 버튼을 사용할 경우:
-
-```bash
-cp .env.example .env
-nano .env
-```
-
-`SHEET_URL` 값을 실제 주소로 바꿉니다.
-
 ## 5. 실행
 
 ```bash
@@ -59,7 +50,8 @@ docker compose ps
 브라우저에서 확인:
 
 ```text
-http://YOUR_EC2_PUBLIC_IP:8000/admin.html
+설문조사: http://YOUR_EC2_PUBLIC_IP:8000/
+DB 관리자: http://YOUR_EC2_PUBLIC_IP:8000/admin.html
 ```
 
 ## 6. 업데이트 배포

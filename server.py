@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 from contextlib import contextmanager
+import csv
 import datetime as dt
+import io
 import json
 import os
 import sqlite3
@@ -13,7 +15,6 @@ from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent
 DB_PATH = Path(os.environ.get("DB_PATH", ROOT / "health_check.sqlite3")).resolve()
-SHEET_URL = os.environ.get("SHEET_URL", "")
 
 
 def connect() -> sqlite3.Connection:
@@ -136,6 +137,90 @@ def result_to_api(row: sqlite3.Row) -> dict[str, object]:
     }
 
 
+def get_all_results() -> list[dict[str, object]]:
+    with db_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                id,
+                name,
+                survey_date,
+                total_score,
+                smoking,
+                steps,
+                ldl,
+                bp,
+                bmi,
+                created_at
+            FROM survey_results
+            ORDER BY survey_date DESC, id DESC
+            """
+        ).fetchall()
+
+    return [
+        {
+            "id": row["id"],
+            "name": row["name"],
+            "date": row["survey_date"],
+            "totalScore": row["total_score"],
+            "smoking": row["smoking"],
+            "steps": row["steps"],
+            "ldl": row["ldl"],
+            "bp": row["bp"],
+            "bmi": row["bmi"],
+            "createdAt": row["created_at"],
+        }
+        for row in rows
+    ]
+
+
+def get_database_summary() -> dict[str, object]:
+    with db_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT
+                COUNT(*) AS total_count,
+                COUNT(DISTINCT name) AS participant_count,
+                ROUND(AVG(total_score), 1) AS average_score,
+                MAX(survey_date) AS latest_date
+            FROM survey_results
+            """
+        ).fetchone()
+
+    return {
+        "totalCount": row["total_count"],
+        "participantCount": row["participant_count"],
+        "averageScore": row["average_score"],
+        "latestDate": row["latest_date"],
+    }
+
+
+def build_results_csv() -> bytes:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        ["ID", "이름", "날짜", "총점", "흡연", "걸음수", "LDL", "혈압", "BMI", "등록시각"]
+    )
+
+    for row in get_all_results():
+        writer.writerow(
+            [
+                row["id"],
+                row["name"],
+                row["date"],
+                row["totalScore"],
+                row["smoking"],
+                row["steps"],
+                row["ldl"],
+                row["bp"],
+                row["bmi"],
+                row["createdAt"],
+            ]
+        )
+
+    return output.getvalue().encode("utf-8-sig")
+
+
 class HealthCheckHandler(BaseHTTPRequestHandler):
     server_version = "HealthCheckServer/1.0"
 
@@ -158,7 +243,9 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         query = parse_qs(parsed.query)
 
         try:
-            if path in {"/", "/admin.html"}:
+            if path in {"/", "/index.html"}:
+                self.send_file(ROOT / "index.html", "text/html; charset=utf-8")
+            elif path == "/admin.html":
                 self.send_file(ROOT / "admin.html", "text/html; charset=utf-8")
             elif path == "/api/health":
                 self.handle_health()
@@ -168,8 +255,19 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
                 self.handle_search_name(query)
             elif path == "/api/recent-3days":
                 self.handle_recent_3days()
-            elif path == "/api/sheet-url":
-                self.send_json({"url": SHEET_URL})
+            elif path == "/api/results":
+                self.send_json(
+                    {
+                        "data": get_all_results(),
+                        "summary": get_database_summary(),
+                    }
+                )
+            elif path == "/api/export.csv":
+                self.send_bytes(
+                    build_results_csv(),
+                    "text/csv; charset=utf-8",
+                    'attachment; filename="health-check-results.csv"',
+                )
             else:
                 self.send_json({"error": "Not found"}, status=404)
         except Exception as exc:
@@ -216,6 +314,21 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def send_bytes(
+        self,
+        body: bytes,
+        content_type: str,
+        content_disposition: str | None = None,
+        status: int = 200,
+    ) -> None:
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        if content_disposition:
+            self.send_header("Content-Disposition", content_disposition)
         self.end_headers()
         self.wfile.write(body)
 
@@ -318,6 +431,7 @@ def main() -> None:
     init_db()
 
     server = ThreadingHTTPServer((args.host, args.port), HealthCheckHandler)
+    print(f"Serving health survey at http://{args.host}:{args.port}/")
     print(f"Serving admin dashboard at http://{args.host}:{args.port}/admin.html")
     print(f"SQLite database: {DB_PATH}")
     server.serve_forever()

@@ -9,7 +9,6 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
       DB_PATH: /data/health_check.sqlite3
-      SHEET_URL: ${SHEET_URL:-}
     volumes:
       - health-check-data:/data
 
