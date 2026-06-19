@@ -6,6 +6,9 @@
 - 이름 검색 및 날짜별 최고 점수
 - 최근 3일 설문자
 - 최근 4개 점수 차트
+- SQLite 전체 데이터 표
+- Excel 호환 CSV 다운로드
+- 설문/관리자 주소 복사 및 설문 QR 코드 생성
 - CSV 가져오기
 - Docker 기반 AWS EC2 배포
 
@@ -15,11 +18,14 @@
 python .\server.py
 ```
 
-브라우저에서 아래 주소를 엽니다.
+브라우저에서 용도에 맞는 주소를 엽니다.
 
 ```text
-http://127.0.0.1:8000/admin.html
+설문조사: http://127.0.0.1:8000/
+DB 관리자: http://127.0.0.1:8000/admin.html
 ```
+
+설문조사는 5개 건강 항목을 합산한 25점 만점 점수를 SQLite에 직접 저장합니다.
 
 데이터베이스 파일은 처음 실행할 때 `health_check.sqlite3`로 생성됩니다.
 
@@ -50,7 +56,8 @@ docker compose up -d --build
 브라우저에서 아래 주소를 엽니다.
 
 ```text
-http://127.0.0.1:8000/admin.html
+설문조사: http://127.0.0.1:8000/
+DB 관리자: http://127.0.0.1:8000/admin.html
 ```
 
 Docker 실행 시 DB는 `health-check-data` 볼륨의 `/data/health_check.sqlite3`에 저장됩니다.
@@ -60,6 +67,8 @@ Docker 실행 시 DB는 `health-check-data` 볼륨의 `/data/health_check.sqlite
 - `GET /api/name-summary`
 - `GET /api/search-name?name=홍길동`
 - `GET /api/recent-3days`
+- `GET /api/results`
+- `GET /api/export.csv`
 - `POST /api/survey-results`
 - `GET /api/health`
 
@@ -78,14 +87,8 @@ Docker 실행 시 DB는 `health-check-data` 볼륨의 `/data/health_check.sqlite
 }
 ```
 
-원본 Google 스프레드시트 버튼을 계속 쓰려면 서버 실행 전에 환경변수 `SHEET_URL`을 지정합니다.
-
-```powershell
-$env:SHEET_URL="https://docs.google.com/spreadsheets/d/..."
-python .\server.py
-```
-
-Docker에서는 `.env.example`을 `.env`로 복사한 뒤 `SHEET_URL` 값을 넣으면 됩니다.
+관리자 화면의 `CSV 다운로드` 버튼으로 DB 전체 데이터를 내려받을 수 있습니다.
+파일은 UTF-8 형식이며 Microsoft Excel에서 바로 열 수 있습니다.
 
 ## GitHub 업로드
 

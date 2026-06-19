@@ -2,331 +2,1040 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>건강 점수 관리자</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="theme-color" content="#18243f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>">
+<title>건강 점수 관리자</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
+:root {
+  --navy: #18243f;
+  --navy-soft: #263657;
+  --blue: #3977f6;
+  --blue-dark: #245ed4;
+  --mint: #35c6a1;
+  --sky: #eaf2ff;
+  --surface: rgba(255,255,255,.96);
+  --background: #f3f6fb;
+  --line: #e3e9f2;
+  --text: #172033;
+  --muted: #68748a;
+  --shadow: 0 18px 45px rgba(31, 48, 82, .10);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background:#f4f6f8;
-  padding:20px;
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 5% 0%, rgba(57,119,246,.14), transparent 26rem),
+    radial-gradient(circle at 95% 10%, rgba(53,198,161,.10), transparent 24rem),
+    var(--background);
+  font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+  min-height: 100vh;
 }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  background:#fff;
-  border-radius:12px;
-  padding:20px;
-  box-shadow:0 0 10px rgba(0,0,0,0.1);
+button, input, a {
+  font: inherit;
 }
 
-h2 {
-  text-align:center;
-  margin-bottom:25px;
+button, .button-link {
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
 }
 
-.section {
-  margin-top:30px;
+button:hover, .button-link:hover {
+  transform: translateY(-1px);
 }
 
-.section h3 {
-  margin-bottom:10px;
+button:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  transform: none;
+}
+
+.app-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 32px auto 60px;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 34px 38px;
+  color: #fff;
+  border-radius: 24px;
+  background: linear-gradient(130deg, var(--navy), #243c70 68%, #286e95);
+  box-shadow: var(--shadow);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -75px;
+  top: -110px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.09);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 999px;
+  background: rgba(255,255,255,.09);
+  color: #dfeaff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -.04em;
+}
+
+.hero p {
+  max-width: 600px;
+  margin: 12px 0 0;
+  color: #d6e0f5;
+  line-height: 1.65;
+}
+
+.db-status {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  min-width: 170px;
+  padding: 17px 19px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 16px;
+  background: rgba(255,255,255,.09);
+  backdrop-filter: blur(8px);
+}
+
+.status-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #cdd9ef;
+  font-size: 13px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #57e5bc;
+  box-shadow: 0 0 0 5px rgba(87,229,188,.13);
+}
+
+.db-status strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+.share-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 24px;
+  margin-top: 20px;
+  padding: 25px;
+  border: 1px solid rgba(218,226,239,.9);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(30,48,80,.06);
+}
+
+.share-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.share-heading h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 20px;
+}
+
+.share-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.share-feedback {
+  min-height: 18px;
+  margin-top: 10px;
+  color: #267660;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.qr-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 230px;
+  padding: 17px;
+  border: 1px dashed #cbd7e8;
+  border-radius: 16px;
+  background: #f8faff;
+  text-align: center;
+}
+
+#qrCode {
+  display: grid;
+  place-items: center;
+  min-width: 164px;
+  min-height: 164px;
+}
+
+#qrCode img, #qrCode canvas {
+  max-width: 164px;
+  height: auto !important;
+  padding: 7px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.qr-placeholder {
+  max-width: 170px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.qr-caption {
+  margin: 10px 0 0;
+  color: #526078;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.stat-card, .card {
+  border: 1px solid rgba(218,226,239,.85);
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(30,48,80,.06);
+}
+
+.stat-card {
+  padding: 21px;
+  border-radius: 18px;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stat-value {
+  margin-top: 9px;
+  color: var(--navy);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+.stat-unit {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.layout-two {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.card {
+  padding: 24px;
+  border-radius: 20px;
+}
+
+.card + .card {
+  margin-top: 20px;
+}
+
+.layout-two .card + .card {
+  margin-top: 0;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 20px;
+  letter-spacing: -.02em;
+}
+
+.card-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.icon-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-box {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--sky);
+  font-size: 18px;
+}
+
+.button-primary, .button-secondary, .button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 43px;
+  padding: 0 17px;
+  text-decoration: none;
+}
+
+.button-primary, .button-link {
+  color: #fff;
+  background: var(--blue);
+  box-shadow: 0 7px 18px rgba(57,119,246,.20);
+}
+
+.button-primary:hover, .button-link:hover {
+  background: var(--blue-dark);
+}
+
+.button-secondary {
+  color: #33415d;
+  background: #edf2f8;
+}
+
+.button-small {
+  min-height: 36px;
+  padding: 0 13px;
+  font-size: 13px;
+}
+
+.search-row, .db-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-row input {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.search-row .button-primary {
+  flex: 0 0 auto;
+  min-width: 112px;
 }
 
 input {
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-top:5px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 15px;
+  color: var(--text);
+  border: 1px solid #d9e1ec;
+  border-radius: 12px;
+  outline: none;
+  background: #fbfcfe;
+  transition: border-color .16s ease, box-shadow .16s ease;
 }
 
-button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  background:#0068ff;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  font-size:15px;
-  cursor:pointer;
+input:focus {
+  border-color: #82a8f9;
+  box-shadow: 0 0 0 4px rgba(57,119,246,.10);
 }
 
-button.secondary {
-  background:#444;
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
 
 table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
 }
 
 th, td {
-  border-bottom:1px solid #ddd;
-  padding:8px;
-  text-align:center;
+  padding: 12px 13px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  white-space: nowrap;
 }
 
 th {
-  background:#f2f2f2;
+  color: #4f5e76;
+  background: #f7f9fc;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+td {
+  font-size: 13px;
+}
+
+tbody tr {
+  transition: background .14s ease;
+}
+
+tbody tr:hover {
+  background: #f7faff;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 5px 9px;
+  color: #245abf;
+  border-radius: 999px;
+  background: #e8f0ff;
+  font-weight: 800;
+}
+
+.summary-table {
+  min-width: 360px;
+}
+
+.recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-list li {
+  padding: 9px 12px;
+  color: #216a59;
+  border: 1px solid #bfeadd;
+  border-radius: 999px;
+  background: #ebfaf5;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .chart-box {
-  margin-top:20px;
+  position: relative;
+  min-height: 290px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfcfe;
 }
 
-ul {
-  padding-left:20px;
+.db-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 15px;
+}
+
+.db-toolbar input {
+  max-width: 360px;
+}
+
+.table-meta {
+  margin: 12px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.empty {
+  padding: 28px !important;
+  color: var(--muted);
+}
+
+.loading {
+  opacity: .55;
+  pointer-events: none;
+}
+
+.footer-note {
+  margin: 18px 0 0;
+  color: #78849a;
+  text-align: center;
+  font-size: 12px;
+}
+
+@media (max-width: 850px) {
+  .share-card {
+    grid-template-columns: 1fr;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .layout-two {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    flex-direction: column;
+  }
+  .db-status {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    width: min(100% - 20px, 1180px);
+    margin-top: 10px;
+  }
+  .hero, .card {
+    padding: 20px;
+    border-radius: 17px;
+  }
+  .share-card {
+    padding: 20px;
+    border-radius: 17px;
+  }
+  .stats-grid {
+    gap: 10px;
+  }
+  .stat-card {
+    padding: 16px;
+  }
+  .stat-value {
+    font-size: 23px;
+  }
+  .card-header, .db-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .search-row, .db-actions {
+    flex-direction: column;
+  }
+  .db-toolbar input {
+    max-width: none;
+  }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
+<main class="app-shell">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">💙 HEALTH DATA CENTER</div>
+      <h1>건강 점수 관리자</h1>
+      <p>참여자의 건강 설문 결과를 한곳에서 확인하고, 점수 흐름과 전체 데이터베이스를 간편하게 관리하세요.</p>
+    </div>
+    <div class="db-status">
+      <span class="status-label"><span class="status-dot"></span>SQLite 연결 상태</span>
+      <strong id="dbConnectionText">확인 중...</strong>
+    </div>
+  </section>
 
-<h2>📊 건강 점수 관리자 대시보드</h2>
+  <section class="share-card" aria-label="공유 링크와 QR 코드">
+    <div>
+      <div class="share-heading">
+        <span class="icon-box">🔗</span>
+        <div>
+          <h2>설문 공유 링크</h2>
+          <p>설문 링크를 바로 복사하거나 QR 코드로 공유할 수 있습니다.</p>
+        </div>
+      </div>
 
-<!-- =======================
-     참여자 요약 (최상단)
-     ======================= -->
-<div class="section">
-  <h3>👥 참여자별 설문 날짜 수</h3>
-  <button onclick="loadNameSummary()">참여도 불러오기</button>
+      <div class="share-actions">
+        <button class="button-primary" onclick="generateSurveyQr()">▦ QR 코드 생성</button>
+        <button class="button-secondary" onclick="generateAndCopySurveyLink()">🔗 설문 링크 생성·복사</button>
+        <button class="button-secondary" onclick="downloadSurveyQr()">↓ QR 저장</button>
+      </div>
+      <div id="shareFeedback" class="share-feedback" aria-live="polite"></div>
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>이름</th>
-        <th>설문한 날짜 수</th>
-      </tr>
-    </thead>
-    <tbody id="summaryBody"></tbody>
-  </table>
-</div>
+    <div class="qr-panel">
+      <div id="qrCode">
+        <div class="qr-placeholder">QR 코드 생성 버튼을 누르면 설문 주소를 휴대폰으로 바로 열 수 있습니다.</div>
+      </div>
+      <p class="qr-caption">건강 점수 설문 QR</p>
+    </div>
+  </section>
 
-<hr>
+  <section class="stats-grid" aria-label="데이터베이스 요약">
+    <article class="stat-card">
+      <div class="stat-label">전체 설문 결과</div>
+      <div class="stat-value"><span id="statTotal">-</span><span class="stat-unit">건</span></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">전체 참여자</div>
+      <div class="stat-value"><span id="statParticipants">-</span><span class="stat-unit">명</span></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">평균 건강 점수</div>
+      <div class="stat-value"><span id="statAverage">-</span><span class="stat-unit">점</span></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">최근 설문일</div>
+      <div class="stat-value" id="statLatest" style="font-size:21px">-</div>
+    </article>
+  </section>
 
-<!-- =======================
-     이름 검색
-     ======================= -->
-<div class="section">
-  <h3>🔍 이름 검색 (날짜별 최고 점수)</h3>
+  <section class="layout-two">
+    <article class="card">
+      <div class="card-header">
+        <div class="icon-title">
+          <span class="icon-box">👥</span>
+          <div>
+            <h2>참여 현황</h2>
+            <p>참여자별로 설문에 참여한 날짜 수입니다.</p>
+          </div>
+        </div>
+        <button class="button-secondary button-small" onclick="loadNameSummary()">새로고침</button>
+      </div>
+      <div class="table-wrap">
+        <table class="summary-table">
+          <thead><tr><th>이름</th><th>설문 참여일</th></tr></thead>
+          <tbody id="summaryBody"><tr><td colspan="2" class="empty">불러오는 중...</td></tr></tbody>
+        </table>
+      </div>
+    </article>
 
-  <input id="nameInput" placeholder="이름 입력">
-  <button onclick="searchName()">검색</button>
+    <article class="card">
+      <div class="card-header">
+        <div class="icon-title">
+          <span class="icon-box">🕒</span>
+          <div>
+            <h2>최근 3일 참여자</h2>
+            <p id="recentRange">최근 데이터 기준으로 계산합니다.</p>
+          </div>
+        </div>
+        <button class="button-secondary button-small" onclick="loadRecent()">새로고침</button>
+      </div>
+      <ul id="recentList" class="recent-list"><li>불러오는 중...</li></ul>
+    </article>
+  </section>
 
-  <table>
-    <thead>
-      <tr>
-        <th>날짜</th>
-        <th>총점</th>
-        <th>흡연</th>
-        <th>걸음수</th>
-        <th>LDL</th>
-        <th>혈압</th>
-        <th>BMI</th>
-      </tr>
-    </thead>
-    <tbody id="resultBody"></tbody>
-  </table>
+  <section class="card">
+    <div class="card-header">
+      <div class="icon-title">
+        <span class="icon-box">📈</span>
+        <div>
+          <h2>참여자 점수 분석</h2>
+          <p>이름을 검색하면 날짜별 최고 점수와 최근 4회의 흐름을 보여줍니다.</p>
+        </div>
+      </div>
+    </div>
 
-  <button class="secondary" onclick="drawChart()">📈 시각화 (최근 4개)</button>
+    <div class="search-row">
+      <input id="nameInput" placeholder="참여자 이름을 입력하세요" autocomplete="off">
+      <button class="button-primary" onclick="searchName()">검색하기</button>
+    </div>
 
-  <div class="chart-box">
-    <canvas id="chart"></canvas>
-  </div>
-</div>
+    <div class="table-wrap" style="margin-top:16px">
+      <table>
+        <thead>
+          <tr><th>날짜</th><th>총점</th><th>흡연</th><th>걸음수</th><th>LDL</th><th>혈압</th><th>BMI</th></tr>
+        </thead>
+        <tbody id="resultBody"><tr><td colspan="7" class="empty">검색할 참여자를 입력하세요.</td></tr></tbody>
+      </table>
+    </div>
 
-<hr>
+    <div class="chart-box">
+      <canvas id="chart"></canvas>
+    </div>
+  </section>
 
-<!-- =======================
-     최근 3일 설문자
-     ======================= -->
-<div class="section">
-  <h3>🕒 최근 3일 설문한 사람</h3>
-  <button onclick="loadRecent()">불러오기</button>
-  <ul id="recentList"></ul>
-</div>
+  <section class="card">
+    <div class="card-header">
+      <div class="icon-title">
+        <span class="icon-box">🗄️</span>
+        <div>
+          <h2>데이터베이스 전체 보기</h2>
+          <p>SQLite에 저장된 원본 설문 결과를 최신 순으로 확인합니다.</p>
+        </div>
+      </div>
+    </div>
 
-<hr>
+    <div class="db-toolbar">
+      <input id="dbFilter" placeholder="이름, 날짜, 점수로 표 필터링" oninput="filterDatabaseRows()">
+      <div class="db-actions">
+        <button class="button-secondary" onclick="loadDatabase()">↻ DB 새로고침</button>
+        <a id="downloadCsv" class="button-link" href="/api/export.csv" download>↓ CSV 다운로드</a>
+      </div>
+    </div>
 
-<!-- =======================
-     스프레드시트 이동
-     ======================= -->
-<div class="section">
-  <button class="secondary" onclick="openSheet()">📄 Google 스프레드시트 열기</button>
-</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>이름</th><th>날짜</th><th>총점</th><th>흡연</th>
+            <th>걸음수</th><th>LDL</th><th>혈압</th><th>BMI</th><th>등록시각</th>
+          </tr>
+        </thead>
+        <tbody id="dbBody"><tr><td colspan="10" class="empty">데이터베이스를 불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="dbCount" class="table-meta"></div>
+  </section>
 
-</div>
+  <p class="footer-note">데이터는 연결된 SQLite 데이터베이스에서 실시간으로 조회됩니다.</p>
+</main>
 
 <script>
 const API_BASE = window.location.protocol === "file:"
   ? "http://127.0.0.1:8000"
   : "";
 
-
 let currentData = [];
+let databaseRows = [];
 let chart;
+let surveyQr;
 
 async function getJson(path){
-  const res = await fetch(`${API_BASE}${path}`);
-  const json = await res.json().catch(()=>({}));
-
-  if(!res.ok){
-    throw new Error(json.error || "서버 요청에 실패했습니다");
+  const response = await fetch(`${API_BASE}${path}`);
+  const json = await response.json().catch(()=>({}));
+  if(!response.ok){
+    throw new Error(json.error || "서버 요청에 실패했습니다.");
   }
-
   return json;
 }
 
 function escapeHtml(value){
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  }[ch]));
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[character]));
 }
 
-/* =======================
-   참여자 요약
-   ======================= */
-async function loadNameSummary(){
+function emptyRow(columns, message){
+  return `<tr><td colspan="${columns}" class="empty">${escapeHtml(message)}</td></tr>`;
+}
+
+function showError(error){
+  console.error(error);
+  alert(error.message || "데이터를 불러오지 못했습니다.");
+}
+
+function surveyPageUrl(){
+  const origin = window.location.origin === "null"
+    ? "http://127.0.0.1:8000"
+    : window.location.origin;
+  return `${origin}/`;
+}
+
+async function generateAndCopySurveyLink(){
+  const surveyLink = surveyPageUrl();
   try{
-    const json = await getJson("/api/name-summary");
-    const tbody = document.getElementById("summaryBody");
-    tbody.innerHTML = "";
+    await navigator.clipboard.writeText(surveyLink);
+  }catch(error){
+    const temporaryInput = document.createElement("textarea");
+    temporaryInput.value = surveyLink;
+    temporaryInput.style.position = "fixed";
+    temporaryInput.style.opacity = "0";
+    document.body.appendChild(temporaryInput);
+    temporaryInput.select();
+    document.execCommand("copy");
+    temporaryInput.remove();
+  }
+  document.getElementById("shareFeedback").textContent =
+    "설문 링크를 생성해 클립보드에 복사했습니다.";
+  return surveyLink;
+}
 
-    if((json.data || []).length === 0){
-      tbody.innerHTML = `<tr><td colspan="2">데이터 없음</td></tr>`;
-      return;
-    }
+function generateSurveyQr(){
+  const surveyLink = surveyPageUrl();
+  const container = document.getElementById("qrCode");
+  container.innerHTML = "";
 
-    json.data.forEach(r=>{
-      tbody.innerHTML += `
-        <tr>
-          <td>${escapeHtml(r.name)}</td>
-          <td><b>${escapeHtml(r.count)}</b></td>
-        </tr>
-      `;
-    });
-  }catch(err){
-    alert(err.message);
+  if(typeof QRCode === "undefined"){
+    container.innerHTML =
+      '<div class="qr-placeholder">QR 코드 라이브러리를 불러오지 못했습니다.</div>';
+    document.getElementById("shareFeedback").textContent =
+      "인터넷 연결을 확인한 뒤 다시 시도해주세요.";
+    return;
+  }
+
+  surveyQr = new QRCode(container, {
+    text: surveyLink,
+    width: 164,
+    height: 164,
+    colorDark: "#18243f",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  document.getElementById("shareFeedback").textContent =
+    "설문 링크 QR 코드를 생성했습니다.";
+}
+
+function downloadSurveyQr(){
+  const container = document.getElementById("qrCode");
+  if(!container.querySelector("img") && !container.querySelector("canvas")){
+    generateSurveyQr();
+  }
+
+  const image = container.querySelector("img");
+  const canvas = container.querySelector("canvas");
+  const source = image?.src || canvas?.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = source;
+  link.download = "health-check-survey-qr.png";
+  link.click();
+  document.getElementById("shareFeedback").textContent =
+    "QR 코드 이미지를 저장했습니다.";
+}
+
+async function loadHealth(){
+  try{
+    const json = await getJson("/api/health");
+    document.getElementById("dbConnectionText").textContent = json.ok ? "정상 연결" : "연결 오류";
+  }catch(error){
+    document.getElementById("dbConnectionText").textContent = "연결 실패";
+    showError(error);
   }
 }
 
-/* =======================
-   이름 검색
-   ======================= */
+async function loadNameSummary(){
+  const body = document.getElementById("summaryBody");
+  try{
+    const json = await getJson("/api/name-summary");
+    const rows = json.data || [];
+    body.innerHTML = rows.length
+      ? rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.name)}</td>
+            <td><span class="score-badge">${escapeHtml(row.count)}일</span></td>
+          </tr>`).join("")
+      : emptyRow(2, "저장된 참여자가 없습니다.");
+  }catch(error){
+    body.innerHTML = emptyRow(2, "참여 현황을 불러오지 못했습니다.");
+    showError(error);
+  }
+}
+
 async function searchName(){
   const name = document.getElementById("nameInput").value.trim();
-  if(!name) return alert("이름을 입력하세요");
+  if(!name){
+    alert("검색할 이름을 입력하세요.");
+    return;
+  }
+
+  const body = document.getElementById("resultBody");
+  body.innerHTML = emptyRow(7, "검색 중...");
 
   try{
     const json = await getJson(`/api/search-name?name=${encodeURIComponent(name)}`);
     currentData = json.data || [];
 
-    const tbody = document.getElementById("resultBody");
-    tbody.innerHTML = "";
+    body.innerHTML = currentData.length
+      ? currentData.map(row => `
+          <tr>
+            <td>${escapeHtml(row.date)}</td>
+            <td><span class="score-badge">${escapeHtml(row.totalScore)}</span></td>
+            <td>${escapeHtml(row.smoking || "-")}</td>
+            <td>${escapeHtml(row.steps || "-")}</td>
+            <td>${escapeHtml(row.ldl || "-")}</td>
+            <td>${escapeHtml(row.bp || "-")}</td>
+            <td>${escapeHtml(row.bmi || "-")}</td>
+          </tr>`).join("")
+      : emptyRow(7, "해당 이름의 데이터가 없습니다.");
 
-    if(currentData.length === 0){
-      tbody.innerHTML = `<tr><td colspan="7">데이터 없음</td></tr>`;
-      return;
-    }
-
-    currentData.forEach(r=>{
-      tbody.innerHTML += `
-        <tr>
-          <td>${escapeHtml(r.date)}</td>
-          <td><b>${escapeHtml(r.totalScore)}</b></td>
-          <td>${escapeHtml(r.smoking)}</td>
-          <td>${escapeHtml(r.steps)}</td>
-          <td>${escapeHtml(r.ldl)}</td>
-          <td>${escapeHtml(r.bp)}</td>
-          <td>${escapeHtml(r.bmi)}</td>
-        </tr>
-      `;
-    });
-  }catch(err){
-    alert(err.message);
+    drawChart();
+  }catch(error){
+    currentData = [];
+    body.innerHTML = emptyRow(7, "검색 결과를 불러오지 못했습니다.");
+    showError(error);
   }
 }
 
-/* =======================
-   차트 (최근 4개)
-   ======================= */
 function drawChart(){
+  const context = document.getElementById("chart").getContext("2d");
+  if(chart) chart.destroy();
+
   if(currentData.length === 0){
-    alert("먼저 이름 검색을 하세요");
     return;
   }
 
   const sliced = currentData.slice(-4);
-  const labels = sliced.map(r => r.date.slice(5,10).replace("-", "/"));
-  const scores = sliced.map(r => r.totalScore);
-
-  const ctx = document.getElementById("chart").getContext("2d");
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx,{
-    type:"line",
-    data:{
-      labels,
-      datasets:[{
-        label:"총점",
-        data:scores,
-        borderWidth:2,
-        borderColor:"#0068ff",
-        tension:0.2
+  const scoreLimit = Math.max(...sliced.map(row => Number(row.totalScore))) <= 25
+    ? 25
+    : 100;
+  chart = new Chart(context,{
+    type: "line",
+    data: {
+      labels: sliced.map(row => row.date.slice(5).replace("-", "/")),
+      datasets: [{
+        label: "건강 점수",
+        data: sliced.map(row => row.totalScore),
+        borderColor: "#3977f6",
+        backgroundColor: "rgba(57,119,246,.12)",
+        pointBackgroundColor: "#ffffff",
+        pointBorderColor: "#3977f6",
+        pointBorderWidth: 3,
+        pointRadius: 5,
+        borderWidth: 3,
+        fill: true,
+        tension: .34
       }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          beginAtZero: true,
+          min: 0,
+          max: scoreLimit,
+          ticks: { stepSize: scoreLimit === 25 ? 5 : 10 }
+        }
+      }
     }
   });
 }
 
-/* =======================
-   최근 3일 설문자
-   ======================= */
 async function loadRecent(){
+  const list = document.getElementById("recentList");
   try{
     const json = await getJson("/api/recent-3days");
-    const ul = document.getElementById("recentList");
-    ul.innerHTML = "";
-
-    if((json.data || []).length === 0){
-      ul.innerHTML = "<li>데이터 없음</li>";
-      return;
-    }
-
-    json.data.forEach(n=>{
-      ul.innerHTML += `<li>${escapeHtml(n)}</li>`;
-    });
-  }catch(err){
-    alert(err.message);
+    const names = json.data || [];
+    list.innerHTML = names.length
+      ? names.map(name => `<li>${escapeHtml(name)}</li>`).join("")
+      : "<li>최근 참여자가 없습니다.</li>";
+    document.getElementById("recentRange").textContent = json.from
+      ? `${json.from} ~ ${json.to}`
+      : "저장된 설문 결과가 없습니다.";
+  }catch(error){
+    list.innerHTML = "<li>불러오지 못했습니다.</li>";
+    showError(error);
   }
 }
 
-/* =======================
-   시트 열기
-   ======================= */
-async function openSheet(){
+function renderDatabaseRows(rows){
+  const body = document.getElementById("dbBody");
+  body.innerHTML = rows.length
+    ? rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.id)}</td>
+          <td><b>${escapeHtml(row.name)}</b></td>
+          <td>${escapeHtml(row.date)}</td>
+          <td><span class="score-badge">${escapeHtml(row.totalScore)}</span></td>
+          <td>${escapeHtml(row.smoking || "-")}</td>
+          <td>${escapeHtml(row.steps || "-")}</td>
+          <td>${escapeHtml(row.ldl || "-")}</td>
+          <td>${escapeHtml(row.bp || "-")}</td>
+          <td>${escapeHtml(row.bmi || "-")}</td>
+          <td>${escapeHtml(row.createdAt || "-")}</td>
+        </tr>`).join("")
+    : emptyRow(10, "조건에 맞는 데이터가 없습니다.");
+
+  document.getElementById("dbCount").textContent =
+    `전체 ${databaseRows.length.toLocaleString()}건 중 ${rows.length.toLocaleString()}건 표시`;
+}
+
+function filterDatabaseRows(){
+  const keyword = document.getElementById("dbFilter").value.trim().toLowerCase();
+  if(!keyword){
+    renderDatabaseRows(databaseRows);
+    return;
+  }
+
+  renderDatabaseRows(databaseRows.filter(row =>
+    [row.id, row.name, row.date, row.totalScore, row.smoking, row.steps, row.ldl, row.bp, row.bmi]
+      .some(value => String(value ?? "").toLowerCase().includes(keyword))
+  ));
+}
+
+async function loadDatabase(){
+  const body = document.getElementById("dbBody");
+  body.innerHTML = emptyRow(10, "데이터베이스를 불러오는 중...");
+
   try{
-    const json = await getJson("/api/sheet-url");
-    if(!json.url){
-      alert("SHEET_URL이 설정되지 않았습니다");
-      return;
-    }
-    window.open(json.url, "_blank");
-  }catch(err){
-    alert(err.message);
+    const json = await getJson("/api/results");
+    databaseRows = json.data || [];
+    const summary = json.summary || {};
+
+    document.getElementById("statTotal").textContent = (summary.totalCount ?? 0).toLocaleString();
+    document.getElementById("statParticipants").textContent = (summary.participantCount ?? 0).toLocaleString();
+    document.getElementById("statAverage").textContent = summary.averageScore ?? "-";
+    document.getElementById("statLatest").textContent = summary.latestDate || "-";
+
+    filterDatabaseRows();
+  }catch(error){
+    body.innerHTML = emptyRow(10, "데이터베이스를 불러오지 못했습니다.");
+    showError(error);
   }
 }
-</script>
 
+document.getElementById("nameInput").addEventListener("keydown", event => {
+  if(event.key === "Enter") searchName();
+});
+
+if(API_BASE){
+  document.getElementById("downloadCsv").href = `${API_BASE}/api/export.csv`;
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadHealth();
+  loadNameSummary();
+  loadRecent();
+  loadDatabase();
+});
+</script>
 </body>
 </html>

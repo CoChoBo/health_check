@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#18243f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>">
+<title>건강 점수 설문</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --navy: #18243f;
+  --navy-soft: #263657;
+  --blue: #3977f6;
+  --blue-dark: #245ed4;
+  --mint: #35c6a1;
+  --surface: rgba(255,255,255,.97);
+  --background: #f3f6fb;
+  --line: #e2e8f2;
+  --text: #172033;
+  --muted: #68748a;
+  --shadow: 0 18px 45px rgba(31,48,82,.10);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 5% 0%, rgba(57,119,246,.14), transparent 26rem),
+    radial-gradient(circle at 95% 10%, rgba(53,198,161,.10), transparent 24rem),
+    var(--background);
+  font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+}
+
+button, input, a {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(940px, calc(100% - 32px));
+  margin: 28px auto 60px;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 36px 40px;
+  color: #fff;
+  border-radius: 24px;
+  background: linear-gradient(130deg, var(--navy), #243c70 68%, #286e95);
+  box-shadow: var(--shadow);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -70px;
+  top: -115px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.09);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 999px;
+  background: rgba(255,255,255,.09);
+  color: #dfeaff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(29px, 5vw, 43px);
+  letter-spacing: -.04em;
+}
+
+.hero p {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: #d6e0f5;
+  line-height: 1.7;
+}
+
+.card {
+  margin-top: 20px;
+  padding: 28px;
+  border: 1px solid rgba(218,226,239,.9);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(30,48,80,.06);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.icon-box {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 41px;
+  height: 41px;
+  border-radius: 13px;
+  background: #eaf2ff;
+  font-size: 19px;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 21px;
+  letter-spacing: -.02em;
+}
+
+.card-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.identity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field label {
+  display: block;
+  margin: 0 0 7px 2px;
+  color: #46546c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 15px;
+  color: var(--text);
+  border: 1px solid #d8e0eb;
+  border-radius: 12px;
+  outline: none;
+  background: #fbfcfe;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+input:focus {
+  border-color: #82a8f9;
+  box-shadow: 0 0 0 4px rgba(57,119,246,.10);
+}
+
+.progress-panel {
+  position: sticky;
+  z-index: 5;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  padding: 16px 20px;
+  border: 1px solid #dce5f2;
+  border-radius: 16px;
+  background: rgba(255,255,255,.93);
+  box-shadow: 0 8px 25px rgba(28,45,78,.09);
+  backdrop-filter: blur(10px);
+}
+
+.progress-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.progress-score {
+  margin-top: 3px;
+  color: var(--navy);
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.progress-score small {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.stars {
+  color: #d8deea;
+  font-size: 25px;
+  letter-spacing: 3px;
+}
+
+.star {
+  position: relative;
+  display: inline-block;
+}
+
+.star.full {
+  color: #ffc94d;
+}
+
+.star.half::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #ffc94d;
+}
+
+.questions {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.question-card {
+  padding: 23px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: var(--surface);
+  box-shadow: 0 7px 23px rgba(30,48,80,.045);
+}
+
+.question-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+}
+
+.question-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 31px;
+  height: 31px;
+  color: #fff;
+  border-radius: 10px;
+  background: var(--blue);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.question-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.question-heading small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 9px;
+}
+
+.option-btn {
+  min-height: 49px;
+  padding: 10px 13px;
+  color: #42506a;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.option-btn:hover {
+  transform: translateY(-1px);
+  border-color: #9bb8f4;
+  background: #f2f6ff;
+}
+
+.option-btn.selected {
+  color: #fff;
+  border-color: var(--blue);
+  background: linear-gradient(135deg, var(--blue), #5269e8);
+  box-shadow: 0 7px 18px rgba(57,119,246,.20);
+}
+
+.bmi-calculator {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 9px;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 14px;
+  background: #f5f8fd;
+}
+
+.button-secondary, .submit-button, .reset-button {
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform .15s ease, background .15s ease;
+}
+
+.button-secondary {
+  min-height: 48px;
+  padding: 0 16px;
+  color: #34435e;
+  background: #e7edf6;
+}
+
+.button-secondary:hover, .submit-button:hover, .reset-button:hover {
+  transform: translateY(-1px);
+}
+
+.bmi-result {
+  min-height: 20px;
+  margin: 0 2px 15px;
+  color: #1f7562;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.submit-card {
+  text-align: center;
+}
+
+.submit-card h2 {
+  margin: 0;
+  color: var(--navy);
+}
+
+.submit-card p {
+  margin: 8px 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.submit-button {
+  width: 100%;
+  min-height: 56px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue), #5167e8);
+  box-shadow: 0 10px 24px rgba(57,119,246,.24);
+  font-size: 16px;
+}
+
+.submit-button:disabled {
+  cursor: wait;
+  opacity: .58;
+}
+
+.save-result {
+  display: none;
+  margin-top: 17px;
+  padding: 18px;
+  color: #175b4c;
+  border: 1px solid #bfe9dc;
+  border-radius: 14px;
+  background: #ecfaf6;
+  line-height: 1.65;
+}
+
+.save-result.visible {
+  display: block;
+}
+
+.result-visualization {
+  display: none;
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid #dce5f2;
+  border-radius: 16px;
+  background: #f8faff;
+  text-align: left;
+}
+
+.result-visualization.visible {
+  display: block;
+}
+
+.result-visualization h3 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 18px;
+}
+
+.result-message {
+  margin: 7px 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.result-chart-box {
+  position: relative;
+  height: 290px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.reset-button {
+  margin-top: 12px;
+  padding: 9px 14px;
+  color: #175b4c;
+  background: #d8f4eb;
+}
+
+.footer-note {
+  margin: 20px 0 0;
+  color: #78849a;
+  text-align: center;
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .app-shell {
+    width: min(100% - 20px, 940px);
+    margin-top: 10px;
+  }
+  .hero, .card, .question-card {
+    padding: 20px;
+    border-radius: 17px;
+  }
+  .identity-grid, .bmi-calculator {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="app-shell">
+  <section class="hero">
+    <div class="eyebrow">💙 HEALTH CHECK SURVEY</div>
+    <h1>나의 건강관리 수준은?</h1>
+    <p>다섯 가지 건강 항목을 선택하면 건강 점수를 계산하고 결과를 데이터베이스에 안전하게 저장합니다.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon-box">👤</span>
+      <div>
+        <h2>참여자 정보</h2>
+        <p>관리자 화면에서 결과를 구분할 수 있도록 이름과 설문 날짜를 입력해주세요.</p>
+      </div>
+    </div>
+    <div class="identity-grid">
+      <div class="field">
+        <label for="participantName">이름</label>
+        <input id="participantName" placeholder="이름을 입력하세요" autocomplete="name" maxlength="50">
+      </div>
+      <div class="field">
+        <label for="surveyDate">설문 날짜</label>
+        <input id="surveyDate" type="date">
+      </div>
+    </div>
+  </section>
+
+  <section class="progress-panel" aria-live="polite">
+    <div>
+      <div class="progress-title">현재 건강 점수</div>
+      <div class="progress-score"><span id="totalScore">0</span><small> / 25점</small></div>
+    </div>
+    <div class="stars" id="starRating" aria-label="별점">
+      <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+    </div>
+  </section>
+
+  <section class="questions">
+    <article class="question-card">
+      <div class="question-heading">
+        <span class="question-number">1</span>
+        <div><h2>흡연 여부</h2><small>현재 흡연 상태를 선택하세요.</small></div>
+      </div>
+      <div class="options">
+        <button type="button" class="option-btn" data-score="3" data-group="흡연">담배 핀다</button>
+        <button type="button" class="option-btn" data-score="5" data-group="흡연">담배 안 핀다</button>
+      </div>
+    </article>
+
+    <article class="question-card">
+      <div class="question-heading">
+        <span class="question-number">2</span>
+        <div><h2>일일 평균 걸음 수</h2><small>평균적인 하루 활동량을 선택하세요.</small></div>
+      </div>
+      <div class="options">
+        <button type="button" class="option-btn" data-score="1" data-group="걸음수">&lt; 2,000</button>
+        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000 - 4,000</button>
+        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000 - 6,000</button>
+        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000 - 8,000</button>
+        <button type="button" class="option-btn" data-score="5" data-group="걸음수">&gt; 8,000</button>
+      </div>
+    </article>
+
+    <article class="question-card">
+      <div class="question-heading">
+        <span class="question-number">3</span>
+        <div><h2>저밀도 콜레스테롤 (LDL)</h2><small>최근 검사 결과(mg/dL)를 기준으로 선택하세요.</small></div>
+      </div>
+      <div class="options">
+        <button type="button" class="option-btn" data-score="5" data-group="LDL">&lt; 70</button>
+        <button type="button" class="option-btn" data-score="4" data-group="LDL">70 - 99</button>
+        <button type="button" class="option-btn" data-score="3" data-group="LDL">100 - 129</button>
+        <button type="button" class="option-btn" data-score="2" data-group="LDL">130 - 159</button>
+        <button type="button" class="option-btn" data-score="1" data-group="LDL">≥ 160</button>
+      </div>
+    </article>
+
+    <article class="question-card">
+      <div class="question-heading">
+        <span class="question-number">4</span>
+        <div><h2>혈압</h2><small>수축기와 이완기 혈압 범위를 선택하세요.</small></div>
+      </div>
+      <div class="options">
+        <button type="button" class="option-btn" data-score="5" data-group="혈압">&lt;120 그리고 &lt;80</button>
+        <button type="button" class="option-btn" data-score="4" data-group="혈압">120-139 또는 80-89</button>
+        <button type="button" class="option-btn" data-score="3" data-group="혈압">120-139 그리고 80-89</button>
+        <button type="button" class="option-btn" data-score="2" data-group="혈압">140-159 또는 90-99</button>
+        <button type="button" class="option-btn" data-score="1" data-group="혈압">수축기 ≥160 또는 이완기 ≥100</button>
+      </div>
+    </article>
+
+    <article class="question-card">
+      <div class="question-heading">
+        <span class="question-number">5</span>
+        <div><h2>BMI (kg/m²)</h2><small>직접 범위를 선택하거나 키와 몸무게로 자동 계산하세요.</small></div>
+      </div>
+
+      <div class="bmi-calculator">
+        <input type="number" id="height" placeholder="키 (cm)" min="80" max="250" step="0.1">
+        <input type="number" id="weight" placeholder="몸무게 (kg)" min="20" max="300" step="0.1">
+        <button type="button" class="button-secondary" onclick="calculateBMI()">BMI 계산</button>
+      </div>
+      <div id="bmiResult" class="bmi-result"></div>
+
+      <div class="options">
+        <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 - 24.9 정상</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="caution">&lt;18.5 또는 25 - 29.9</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="over">30 - 34.9</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obese">35 - 39.9</button>
+        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="severe">≥ 40</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="card submit-card">
+    <h2>설문 결과 저장</h2>
+    <p>모든 항목을 선택하면 계산된 점수와 응답이 SQLite 데이터베이스에 저장됩니다.</p>
+    <button id="submitButton" type="button" class="submit-button" onclick="submitSurvey()">건강 설문 제출하기</button>
+    <div id="saveResult" class="save-result"></div>
+    <div id="resultVisualization" class="result-visualization">
+      <h3>최근 건강 점수 변화</h3>
+      <p id="resultMessage" class="result-message"></p>
+      <div class="result-chart-box">
+        <canvas id="resultChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <p class="footer-note">이 설문은 건강 상태를 간단히 점검하기 위한 참고용이며 의학적 진단을 대신하지 않습니다.</p>
+</main>
+
+<script>
+const API_BASE = window.location.protocol === "file:"
+  ? "http://127.0.0.1:8000"
+  : "";
+
+const groupNames = ["흡연", "걸음수", "LDL", "혈압", "BMI"];
+const groups = Object.fromEntries(groupNames.map(name => [name, null]));
+const buttons = document.querySelectorAll(".option-btn");
+let rawScore = 0;
+let calculatedBMI = "";
+let resultChart;
+
+function localDateString(){
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+}
+
+document.getElementById("surveyDate").value = localDateString();
+
+function selectOption(button, preserveCalculatedBMI = false){
+  const groupName = button.dataset.group;
+  const previous = groups[groupName];
+
+  if(groupName === "BMI" && !preserveCalculatedBMI){
+    calculatedBMI = "";
+    document.getElementById("bmiResult").textContent = "";
+  }
+
+  if(previous && previous !== button){
+    previous.classList.remove("selected");
+  }
+
+  if(previous === button){
+    button.classList.remove("selected");
+    groups[groupName] = null;
+    if(groupName === "BMI") calculatedBMI = "";
+  }else{
+    button.classList.add("selected");
+    groups[groupName] = button;
+  }
+
+  updateScore();
+  hideSaveResult();
+}
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => selectOption(button));
+});
+
+function updateScore(){
+  rawScore = Object.values(groups).reduce(
+    (sum, button) => sum + (button ? Number(button.dataset.score) : 0),
+    0
+  );
+  document.getElementById("totalScore").textContent = rawScore;
+  updateStars(rawScore);
+}
+
+function updateStars(score){
+  const scoreOutOfFive = Math.round((score / 25 * 5) * 2) / 2;
+  document.querySelectorAll("#starRating .star").forEach((star, index) => {
+    star.className = "star";
+    if(scoreOutOfFive >= index + 1) star.classList.add("full");
+    else if(scoreOutOfFive >= index + .5) star.classList.add("half");
+  });
+}
+
+function calculateBMI(){
+  const height = Number(document.getElementById("height").value);
+  const weight = Number(document.getElementById("weight").value);
+
+  if(!height || !weight || height <= 0 || weight <= 0){
+    alert("키와 몸무게를 올바르게 입력해주세요.");
+    return;
+  }
+
+  const bmi = weight / ((height / 100) ** 2);
+  calculatedBMI = bmi.toFixed(1);
+
+  let range;
+  let status;
+  if(bmi < 18.5){
+    range = "caution";
+    status = "저체중";
+  }else if(bmi < 25){
+    range = "normal";
+    status = "정상";
+  }else if(bmi < 30){
+    range = "caution";
+    status = "과체중";
+  }else if(bmi < 35){
+    range = "over";
+    status = "비만 1단계";
+  }else if(bmi < 40){
+    range = "obese";
+    status = "비만 2단계";
+  }else{
+    range = "severe";
+    status = "고도비만";
+  }
+
+  const matchingButton = document.querySelector(`[data-bmi-range="${range}"]`);
+  if(groups.BMI !== matchingButton) selectOption(matchingButton, true);
+  document.getElementById("bmiResult").textContent =
+    `계산 결과: BMI ${calculatedBMI} (${status}) · 해당 범위가 자동 선택되었습니다.`;
+}
+
+function hideSaveResult(){
+  const result = document.getElementById("saveResult");
+  result.classList.remove("visible");
+  result.innerHTML = "";
+  document.getElementById("resultVisualization").classList.remove("visible");
+  if(resultChart){
+    resultChart.destroy();
+    resultChart = null;
+  }
+}
+
+function resultMessage(score){
+  if(score >= 22) return "전반적으로 건강 관리가 잘 이루어지고 있습니다. 현재 습관을 꾸준히 유지해보세요.";
+  if(score >= 18) return "건강 관리 상태가 양호합니다. 점수가 낮은 항목을 중심으로 조금씩 개선해보세요.";
+  if(score >= 13) return "일부 건강 습관에 주의가 필요합니다. 무리하지 않는 범위에서 생활 습관을 점검해보세요.";
+  return "건강 관리가 필요한 항목이 있습니다. 필요하면 의료 전문가와 상담해보세요.";
+}
+
+async function drawResultGraph(name){
+  const response = await fetch(
+    `${API_BASE}/api/search-name?name=${encodeURIComponent(name)}`
+  );
+  const json = await response.json().catch(() => ({}));
+  if(!response.ok) throw new Error(json.error || "점수 그래프를 불러오지 못했습니다.");
+
+  const recentScores = (json.data || []).slice(-4);
+  if(recentScores.length === 0) return;
+
+  if(resultChart) resultChart.destroy();
+  const context = document.getElementById("resultChart").getContext("2d");
+  resultChart = new Chart(context, {
+    type: "line",
+    data: {
+      labels: recentScores.map(row => row.date.slice(5).replace("-", "/")),
+      datasets: [{
+        label: "건강 점수",
+        data: recentScores.map(row => row.totalScore),
+        borderColor: "#3977f6",
+        backgroundColor: "rgba(57,119,246,.12)",
+        pointBackgroundColor: "#ffffff",
+        pointBorderColor: "#3977f6",
+        pointBorderWidth: 3,
+        pointRadius: 5,
+        borderWidth: 3,
+        fill: true,
+        tension: .34
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: context => `건강 점수: ${context.parsed.y} / 25점`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          beginAtZero: true,
+          min: 0,
+          max: 25,
+          ticks: { stepSize: 5 }
+        }
+      }
+    }
+  });
+
+  document.getElementById("resultMessage").textContent =
+    `${resultMessage(rawScore)} 최근 ${recentScores.length}회의 총점 변화입니다.`;
+  document.getElementById("resultVisualization").classList.add("visible");
+}
+
+async function submitSurvey(){
+  const name = document.getElementById("participantName").value.trim();
+  const date = document.getElementById("surveyDate").value;
+  const missingGroups = groupNames.filter(groupName => !groups[groupName]);
+
+  if(!name){
+    alert("이름을 입력해주세요.");
+    document.getElementById("participantName").focus();
+    return;
+  }
+  if(!date){
+    alert("설문 날짜를 선택해주세요.");
+    return;
+  }
+  if(missingGroups.length){
+    alert(`선택하지 않은 항목이 있습니다: ${missingGroups.join(", ")}`);
+    return;
+  }
+
+  const payload = {
+    name,
+    date,
+    totalScore: rawScore,
+    smoking: groups["흡연"].textContent.trim(),
+    steps: groups["걸음수"].textContent.trim(),
+    ldl: groups["LDL"].textContent.trim(),
+    bp: groups["혈압"].textContent.trim(),
+    bmi: calculatedBMI || groups["BMI"].textContent.trim()
+  };
+
+  const submitButton = document.getElementById("submitButton");
+  submitButton.disabled = true;
+  submitButton.textContent = "저장 중...";
+
+  try{
+    const response = await fetch(`${API_BASE}/api/survey-results`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    const json = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(json.error || "설문 저장에 실패했습니다.");
+
+    const result = document.getElementById("saveResult");
+    result.innerHTML = `
+      <strong>저장이 완료되었습니다.</strong><br>
+      ${escapeHtml(name)}님의 건강 점수는 <b>${payload.totalScore}점</b>입니다.
+      <br><button type="button" class="reset-button" onclick="resetSurvey()">새 설문 작성</button>
+    `;
+    result.classList.add("visible");
+    try{
+      await drawResultGraph(name);
+    }catch(graphError){
+      console.error(graphError);
+      document.getElementById("resultMessage").textContent =
+        "점수는 저장되었지만 그래프를 불러오지 못했습니다.";
+      document.getElementById("resultVisualization").classList.add("visible");
+    }
+    result.scrollIntoView({behavior: "smooth", block: "center"});
+    submitButton.textContent = "저장 완료";
+  }catch(error){
+    alert(error.message);
+    submitButton.disabled = false;
+    submitButton.textContent = "건강 설문 제출하기";
+  }
+}
+
+function resetSurvey(){
+  document.getElementById("participantName").value = "";
+  document.getElementById("surveyDate").value = localDateString();
+  document.getElementById("height").value = "";
+  document.getElementById("weight").value = "";
+  document.getElementById("bmiResult").textContent = "";
+  calculatedBMI = "";
+
+  Object.keys(groups).forEach(groupName => {
+    if(groups[groupName]) groups[groupName].classList.remove("selected");
+    groups[groupName] = null;
+  });
+
+  updateScore();
+  hideSaveResult();
+  const submitButton = document.getElementById("submitButton");
+  submitButton.disabled = false;
+  submitButton.textContent = "건강 설문 제출하기";
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[character]));
+}
+</script>
+</body>
+</html>
