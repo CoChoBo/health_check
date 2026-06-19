@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#18243f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<title>관리자 로그인</title>
+<style>
+:root {
+  --navy: #18243f;
+  --blue: #3977f6;
+  --blue-dark: #245ed4;
+  --text: #172033;
+  --muted: #68748a;
+  --line: #dce4ef;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 5% 0%, rgba(57,119,246,.17), transparent 28rem),
+    radial-gradient(circle at 95% 10%, rgba(53,198,161,.11), transparent 25rem),
+    #f3f6fb;
+  font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+}
+
+.login-card {
+  width: min(440px, 100%);
+  padding: 34px;
+  border: 1px solid rgba(218,226,239,.9);
+  border-radius: 22px;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 22px 55px rgba(31,48,82,.13);
+}
+
+.lock {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  background: #eaf2ff;
+  font-size: 24px;
+}
+
+h1 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 28px;
+  letter-spacing: -.03em;
+}
+
+.description {
+  margin: 9px 0 25px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  margin: 14px 0 7px 2px;
+  color: #46546c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  background: #fbfcfe;
+  font: inherit;
+}
+
+input:focus {
+  border-color: #82a8f9;
+  box-shadow: 0 0 0 4px rgba(57,119,246,.10);
+}
+
+button {
+  width: 100%;
+  min-height: 51px;
+  margin-top: 22px;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  background: var(--blue);
+  box-shadow: 0 8px 22px rgba(57,119,246,.22);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+button:hover { background: var(--blue-dark); }
+button:disabled { cursor: wait; opacity: .6; }
+
+.message {
+  min-height: 20px;
+  margin: 13px 0 0;
+  color: #bf3650;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.security-note {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  color: #7b879b;
+  border-top: 1px solid #e8edf4;
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<main class="login-card">
+  <div class="lock">🔐</div>
+  <h1>관리자 로그인</h1>
+  <p class="description">건강 설문 결과와 CSV 다운로드는 관리자만 확인할 수 있습니다.</p>
+
+  <form id="loginForm">
+    <label for="username">관리자 아이디</label>
+    <input id="username" name="username" autocomplete="username" required autofocus>
+
+    <label for="password">비밀번호</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+    <button id="loginButton" type="submit">로그인</button>
+    <p id="message" class="message" aria-live="polite"></p>
+  </form>
+
+  <p class="security-note">아이디와 비밀번호는 서버의 환경변수로만 관리됩니다.</p>
+</main>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = document.getElementById("loginButton");
+  const message = document.getElementById("message");
+  button.disabled = true;
+  button.textContent = "확인 중...";
+  message.textContent = "";
+
+  try{
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+      })
+    });
+    const json = await response.json().catch(() => ({}));
+    if(!response.ok){
+      throw new Error(
+        response.status === 429
+          ? "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요."
+          : json.error === "Admin credentials are not configured"
+            ? "서버에 관리자 계정이 설정되지 않았습니다."
+            : "아이디 또는 비밀번호가 올바르지 않습니다."
+      );
+    }
+    window.location.replace("/admin.html");
+  }catch(error){
+    message.textContent = error.message;
+    button.disabled = false;
+    button.textContent = "로그인";
+  }
+});
+</script>
+</body>
+</html>
