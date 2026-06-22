@@ -8,7 +8,7 @@ ENV DB_PATH=/data/health_check.sqlite3
 
 WORKDIR /app
 
-COPY index.html admin.html import_csv.py server.py README.md ./
+COPY index.html admin.html login.html import_csv.py server.py README.md ./
 
 RUN mkdir -p /data
 

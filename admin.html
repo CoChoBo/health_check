@@ -152,6 +152,23 @@ button:disabled {
   font-size: 18px;
 }
 
+.logout-button {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 13px;
+  color: #e8f0ff;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 10px;
+  background: rgba(255,255,255,.08);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.logout-button:hover {
+  background: rgba(255,255,255,.15);
+}
+
 .share-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
@@ -587,6 +604,7 @@ tbody tr:last-child td {
     <div class="db-status">
       <span class="status-label"><span class="status-dot"></span>SQLite 연결 상태</span>
       <strong id="dbConnectionText">확인 중...</strong>
+      <button class="logout-button" onclick="logoutAdmin()">로그아웃</button>
     </div>
   </section>
 
@@ -749,10 +767,22 @@ let surveyQr;
 async function getJson(path){
   const response = await fetch(`${API_BASE}${path}`);
   const json = await response.json().catch(()=>({}));
+  if(response.status === 401){
+    window.location.replace("/admin/login.html");
+    throw new Error("로그인이 만료되었습니다.");
+  }
   if(!response.ok){
     throw new Error(json.error || "서버 요청에 실패했습니다.");
   }
   return json;
+}
+
+async function logoutAdmin(){
+  try{
+    await fetch("/api/admin/logout", {method: "POST"});
+  }finally{
+    window.location.replace("/admin/login.html");
+  }
 }
 
 function escapeHtml(value){

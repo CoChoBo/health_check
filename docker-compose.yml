@@ -9,6 +9,11 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
       DB_PATH: /data/health_check.sqlite3
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Set ADMIN_USERNAME in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:?Set ADMIN_SESSION_SECRET in .env}
+      ADMIN_SESSION_HOURS: ${ADMIN_SESSION_HOURS:-8}
+      ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-0}
     volumes:
       - health-check-data:/data
 

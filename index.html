@@ -727,14 +727,8 @@ function resultMessage(score){
   return "건강 관리가 필요한 항목이 있습니다. 필요하면 의료 전문가와 상담해보세요.";
 }
 
-async function drawResultGraph(name){
-  const response = await fetch(
-    `${API_BASE}/api/search-name?name=${encodeURIComponent(name)}`
-  );
-  const json = await response.json().catch(() => ({}));
-  if(!response.ok) throw new Error(json.error || "점수 그래프를 불러오지 못했습니다.");
-
-  const recentScores = (json.data || []).slice(-4);
+async function drawResultGraph(recentData){
+  const recentScores = (recentData || []).slice(-4);
   if(recentScores.length === 0) return;
 
   if(resultChart) resultChart.destroy();
@@ -835,7 +829,7 @@ async function submitSurvey(){
     `;
     result.classList.add("visible");
     try{
-      await drawResultGraph(name);
+      await drawResultGraph(json.data);
     }catch(graphError){
       console.error(graphError);
       document.getElementById("resultMessage").textContent =

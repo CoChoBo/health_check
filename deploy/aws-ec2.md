@@ -42,6 +42,32 @@ cd <REPO>
 
 ## 5. 실행
 
+관리자 계정 설정 파일을 만듭니다.
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+아래 값을 실제 사용할 값으로 변경합니다.
+
+```dotenv
+ADMIN_USERNAME=원하는-관리자-아이디
+ADMIN_PASSWORD=16자-이상의-고유한-비밀번호
+ADMIN_SESSION_SECRET=무작위-세션-서명키
+ADMIN_SESSION_HOURS=8
+ADMIN_COOKIE_SECURE=0
+```
+
+세션 서명키는 서버에서 아래 명령으로 생성할 수 있습니다.
+
+```bash
+openssl rand -hex 32
+```
+
+HTTP로 기능을 확인하는 동안에는 `ADMIN_COOKIE_SECURE=0`을 사용합니다.
+도메인과 HTTPS를 적용한 뒤에는 반드시 `ADMIN_COOKIE_SECURE=1`로 변경합니다.
+
 ```bash
 docker compose up -d --build
 docker compose ps
@@ -53,6 +79,8 @@ docker compose ps
 설문조사: http://YOUR_EC2_PUBLIC_IP:8000/
 DB 관리자: http://YOUR_EC2_PUBLIC_IP:8000/admin.html
 ```
+
+관리자 페이지는 `.env`에 설정한 아이디와 비밀번호로 로그인합니다.
 
 ## 6. 업데이트 배포
 

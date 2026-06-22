@@ -15,6 +15,9 @@
 ## 로컬 실행
 
 ```powershell
+$env:ADMIN_USERNAME="원하는-관리자-아이디"
+$env:ADMIN_PASSWORD="16자-이상의-고유한-비밀번호"
+$env:ADMIN_SESSION_SECRET="충분히-긴-무작위-문자열"
 python .\server.py
 ```
 
@@ -48,6 +51,21 @@ python .\import_csv.py .\survey.csv
 인식하는 기본 컬럼명은 `이름`, `날짜`, `총점`, `흡연`, `걸음수`, `LDL`, `혈압`, `BMI`입니다. 영어 컬럼명 `name`, `date`, `totalScore`, `smoking`, `steps`, `ldl`, `bp`, `bmi`도 사용할 수 있습니다.
 
 ## Docker 실행
+
+`.env.example`을 `.env`로 복사하고 관리자 계정 값을 설정합니다.
+
+```powershell
+Copy-Item .env.example .env
+notepad .env
+```
+
+`ADMIN_SESSION_SECRET`은 아래처럼 생성할 수 있습니다.
+
+```powershell
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+그다음 컨테이너를 실행합니다.
 
 ```powershell
 docker compose up -d --build
@@ -89,6 +107,14 @@ Docker 실행 시 DB는 `health-check-data` 볼륨의 `/data/health_check.sqlite
 
 관리자 화면의 `CSV 다운로드` 버튼으로 DB 전체 데이터를 내려받을 수 있습니다.
 파일은 UTF-8 형식이며 Microsoft Excel에서 바로 열 수 있습니다.
+
+## 관리자 인증
+
+- 설문 페이지와 `POST /api/survey-results`는 공개됩니다.
+- 관리자 페이지와 데이터 조회·검색·CSV API는 로그인 세션으로 보호됩니다.
+- 아이디와 비밀번호는 `.env` 또는 서버 환경변수에만 저장하며 Git에 올리지 않습니다.
+- `ADMIN_COOKIE_SECURE=0`은 HTTP 테스트용입니다. HTTPS 적용 후에는 `1`로 변경하세요.
+- 로그인 세션의 기본 유효 시간은 8시간이며 `ADMIN_SESSION_HOURS`로 변경할 수 있습니다.
 
 ## GitHub 업로드
 
