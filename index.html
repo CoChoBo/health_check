@@ -326,6 +326,28 @@ input:focus {
   box-shadow: 0 7px 18px rgba(57,119,246,.20);
 }
 
+.option-main,
+.option-note {
+  display: block;
+}
+
+.option-main {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.option-note {
+  margin-top: 4px;
+  color: #6a7589;
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.option-btn.selected .option-note {
+  color: rgba(255,255,255,.82);
+}
+
 .bmi-calculator, .bp-calculator {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
@@ -551,11 +573,11 @@ input:focus {
         <div><h2>일일 평균 걸음 수</h2><small>평균적인 하루 활동량을 선택하세요.</small></div>
       </div>
       <div class="options">
-        <button type="button" class="option-btn" data-score="1" data-group="걸음수">2,000보 이하 (약 20분 이하)</button>
-        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000~4,000보 (약 20~40분)</button>
-        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000~6,000보 (약 40~60분)</button>
-        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000~8,000보 (약 60~80분)</button>
-        <button type="button" class="option-btn" data-score="5" data-group="걸음수">8,000보 이상 (약 80분 이상)</button>
+        <button type="button" class="option-btn" data-score="1" data-group="걸음수" data-value="2,000보 이하 (약 20분 이하)"><span class="option-main">2,000보 이하</span><span class="option-note">약 20분 이하</span></button>
+        <button type="button" class="option-btn" data-score="2" data-group="걸음수" data-value="2,000~4,000보 (약 20~40분)"><span class="option-main">2,000~4,000보</span><span class="option-note">약 20~40분</span></button>
+        <button type="button" class="option-btn" data-score="3" data-group="걸음수" data-value="4,000~6,000보 (약 40~60분)"><span class="option-main">4,000~6,000보</span><span class="option-note">약 40~60분</span></button>
+        <button type="button" class="option-btn" data-score="4" data-group="걸음수" data-value="6,000~8,000보 (약 60~80분)"><span class="option-main">6,000~8,000보</span><span class="option-note">약 60~80분</span></button>
+        <button type="button" class="option-btn" data-score="5" data-group="걸음수" data-value="8,000보 이상 (약 80분 이상)"><span class="option-main">8,000보 이상</span><span class="option-note">약 80분 이상</span></button>
       </div>
     </article>
 
@@ -565,11 +587,11 @@ input:focus {
         <div><h2>저밀도 콜레스테롤 (LDL)</h2><small>최근 검사 결과(mg/dL)를 기준으로 선택하세요.</small></div>
       </div>
       <div class="options">
-        <button type="button" class="option-btn" data-score="5" data-group="LDL">&lt; 100</button>
-        <button type="button" class="option-btn" data-score="4" data-group="LDL">100 - 129</button>
-        <button type="button" class="option-btn" data-score="3" data-group="LDL">130 - 159</button>
-        <button type="button" class="option-btn" data-score="2" data-group="LDL">160 - 189</button>
-        <button type="button" class="option-btn" data-score="1" data-group="LDL">≥ 190</button>
+        <button type="button" class="option-btn" data-score="5" data-group="LDL">100 미만</button>
+        <button type="button" class="option-btn" data-score="4" data-group="LDL">100 이상 129 이하</button>
+        <button type="button" class="option-btn" data-score="3" data-group="LDL">130 이상 159 이하</button>
+        <button type="button" class="option-btn" data-score="2" data-group="LDL">160 이상 189 이하</button>
+        <button type="button" class="option-btn" data-score="1" data-group="LDL">190 이상</button>
       </div>
     </article>
 
@@ -594,20 +616,20 @@ input:focus {
         <div>
           <h3 class="bp-group-title">수축기 혈압 (SBP)</h3>
           <div class="options">
-            <button type="button" class="option-btn" data-score="2.5" data-group="수축기 혈압" data-bp-range="normal">&lt; 120</button>
-            <button type="button" class="option-btn" data-score="2" data-group="수축기 혈압" data-bp-range="elevated">120 - 129</button>
-            <button type="button" class="option-btn" data-score="1.5" data-group="수축기 혈압" data-bp-range="stage1">130 - 139</button>
-            <button type="button" class="option-btn" data-score="1" data-group="수축기 혈압" data-bp-range="stage2">140 - 180</button>
-            <button type="button" class="option-btn" data-score="0.5" data-group="수축기 혈압" data-bp-range="crisis">&gt; 180</button>
+            <button type="button" class="option-btn" data-score="2.5" data-group="수축기 혈압" data-bp-range="normal">120 미만</button>
+            <button type="button" class="option-btn" data-score="2" data-group="수축기 혈압" data-bp-range="elevated">120 이상 129 이하</button>
+            <button type="button" class="option-btn" data-score="1.5" data-group="수축기 혈압" data-bp-range="stage1">130 이상 139 이하</button>
+            <button type="button" class="option-btn" data-score="1" data-group="수축기 혈압" data-bp-range="stage2">140 이상 180 이하</button>
+            <button type="button" class="option-btn" data-score="0.5" data-group="수축기 혈압" data-bp-range="crisis">181 이상</button>
           </div>
         </div>
         <div>
           <h3 class="bp-group-title">이완기 혈압 (DBP)</h3>
           <div class="options">
-            <button type="button" class="option-btn" data-score="2.5" data-group="이완기 혈압" data-bp-range="normal">&lt; 80</button>
-            <button type="button" class="option-btn" data-score="1.5" data-group="이완기 혈압" data-bp-range="stage1">80 - 89</button>
-            <button type="button" class="option-btn" data-score="1" data-group="이완기 혈압" data-bp-range="stage2">90 - 120</button>
-            <button type="button" class="option-btn" data-score="0.5" data-group="이완기 혈압" data-bp-range="crisis">&gt; 120</button>
+            <button type="button" class="option-btn" data-score="2.5" data-group="이완기 혈압" data-bp-range="normal">80 미만</button>
+            <button type="button" class="option-btn" data-score="1.5" data-group="이완기 혈압" data-bp-range="stage1">80 이상 89 이하</button>
+            <button type="button" class="option-btn" data-score="1" data-group="이완기 혈압" data-bp-range="stage2">90 이상 120 이하</button>
+            <button type="button" class="option-btn" data-score="0.5" data-group="이완기 혈압" data-bp-range="crisis">121 이상</button>
           </div>
         </div>
       </div>
@@ -633,14 +655,14 @@ input:focus {
       <div id="bmiResult" class="bmi-result"></div>
 
       <div class="options">
-        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="severeThinness">&lt; 16.0</button>
-        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="moderateThinness">16.0 - 16.9</button>
-        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="mildThinness">17.0 - 18.4</button>
-        <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 - 24.9</button>
-        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="overweight">25.0 - 29.9</button>
-        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="obesity1">30.0 - 34.9</button>
-        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obesity2">35.0 - 39.9</button>
-        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="obesity3">≥ 40.0</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="severeThinness">16.0 미만</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="moderateThinness">16.0 이상 16.9 이하</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="mildThinness">17.0 이상 18.4 이하</button>
+        <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 이상 24.9 이하</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="overweight">25.0 이상 29.9 이하</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="obesity1">30.0 이상 34.9 이하</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obesity2">35.0 이상 39.9 이하</button>
+        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="obesity3">40.0 이상</button>
       </div>
     </article>
   </section>
@@ -974,6 +996,10 @@ async function drawResultGraph(recentData){
   document.getElementById("resultVisualization").classList.add("visible");
 }
 
+function optionValue(button){
+  return (button.dataset.value || button.textContent).replace(/\s+/g, " ").trim();
+}
+
 async function submitSurvey(){
   const name = document.getElementById("participantName").value.trim();
   const date = document.getElementById("surveyDate").value;
@@ -997,13 +1023,13 @@ async function submitSurvey(){
     name,
     date,
     totalScore: rawScore,
-    smoking: groups["흡연"].textContent.trim(),
-    steps: groups["걸음수"].textContent.trim(),
-    ldl: groups["LDL"].textContent.trim(),
+    smoking: optionValue(groups["흡연"]),
+    steps: optionValue(groups["걸음수"]),
+    ldl: optionValue(groups["LDL"]),
     bp: calculatedBP
-      ? `${calculatedBP} (수축기 ${groups["수축기 혈압"].textContent.trim()}, 이완기 ${groups["이완기 혈압"].textContent.trim()})`
-      : `수축기 ${groups["수축기 혈압"].textContent.trim()}, 이완기 ${groups["이완기 혈압"].textContent.trim()}`,
-    bmi: calculatedBMI || groups["BMI"].textContent.trim()
+      ? `${calculatedBP} (수축기 ${optionValue(groups["수축기 혈압"])}, 이완기 ${optionValue(groups["이완기 혈압"])})`
+      : `수축기 ${optionValue(groups["수축기 혈압"])}, 이완기 ${optionValue(groups["이완기 혈압"])}`,
+    bmi: calculatedBMI || optionValue(groups["BMI"])
   };
 
   const submitButton = document.getElementById("submitButton");
