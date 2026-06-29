@@ -336,6 +336,11 @@ input:focus {
   background: #f5f8fd;
 }
 
+.bmi-calculator .button-secondary,
+.bp-calculator .button-secondary {
+  align-self: end;
+}
+
 .button-secondary, .submit-button, .reset-button {
   border: 0;
   border-radius: 12px;
@@ -535,7 +540,7 @@ input:focus {
       </div>
       <div class="options">
         <button type="button" class="option-btn" data-score="1" data-group="흡연">흡연한다</button>
-        <button type="button" class="option-btn" data-score="3" data-group="흡연">과거 흡연했지만 현재 금연중</button>
+        <button type="button" class="option-btn" data-score="3" data-group="흡연">금연중</button>
         <button type="button" class="option-btn" data-score="5" data-group="흡연">피운 적 없다</button>
       </div>
     </article>
@@ -546,11 +551,11 @@ input:focus {
         <div><h2>일일 평균 걸음 수</h2><small>평균적인 하루 활동량을 선택하세요.</small></div>
       </div>
       <div class="options">
-        <button type="button" class="option-btn" data-score="1" data-group="걸음수">&lt; 2,000</button>
-        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000 - 4,000</button>
-        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000 - 6,000</button>
-        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000 - 8,000</button>
-        <button type="button" class="option-btn" data-score="5" data-group="걸음수">&gt; 8,000</button>
+        <button type="button" class="option-btn" data-score="1" data-group="걸음수">2,000보 이하 (약 20분 이하)</button>
+        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000~4,000보 (약 20~40분)</button>
+        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000~6,000보 (약 40~60분)</button>
+        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000~8,000보 (약 60~80분)</button>
+        <button type="button" class="option-btn" data-score="5" data-group="걸음수">8,000보 이상 (약 80분 이상)</button>
       </div>
     </article>
 
@@ -574,9 +579,15 @@ input:focus {
         <div><h2>혈압</h2><small>수축기와 이완기 혈압 범위를 각각 선택하세요.</small></div>
       </div>
       <div class="bp-calculator">
-        <input type="number" id="systolicBp" placeholder="수축기 혈압" min="60" max="260" step="1">
-        <input type="number" id="diastolicBp" placeholder="이완기 혈압" min="30" max="180" step="1">
-        <button type="button" class="button-secondary" onclick="calculateBloodPressure()">혈압 판정</button>
+        <div class="field">
+          <label for="systolicBp">수축기 혈압</label>
+          <input type="number" id="systolicBp" placeholder="예: 120" min="60" max="260" step="1" oninput="autoSelectBloodPressure()">
+        </div>
+        <div class="field">
+          <label for="diastolicBp">이완기 혈압</label>
+          <input type="number" id="diastolicBp" placeholder="예: 80" min="30" max="180" step="1" oninput="autoSelectBloodPressure()">
+        </div>
+        <button type="button" class="button-secondary" onclick="calculateBloodPressure()">혈압 점수 계산</button>
       </div>
       <div id="bpResult" class="bp-result"></div>
       <div class="bp-options">
@@ -609,21 +620,27 @@ input:focus {
       </div>
 
       <div class="bmi-calculator">
-        <input type="number" id="height" placeholder="키 (cm)" min="80" max="250" step="0.1">
-        <input type="number" id="weight" placeholder="몸무게 (kg)" min="20" max="300" step="0.1">
-        <button type="button" class="button-secondary" onclick="calculateBMI()">BMI 계산</button>
+        <div class="field">
+          <label for="height">키</label>
+          <input type="number" id="height" placeholder="cm" min="80" max="250" step="0.1" oninput="autoSelectBMI()">
+        </div>
+        <div class="field">
+          <label for="weight">몸무게</label>
+          <input type="number" id="weight" placeholder="kg" min="20" max="300" step="0.1" oninput="autoSelectBMI()">
+        </div>
+        <button type="button" class="button-secondary" onclick="calculateBMI()">BMI 점수 계산</button>
       </div>
       <div id="bmiResult" class="bmi-result"></div>
 
       <div class="options">
-        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="severeThinness">&lt; 16.0 심한 저체중</button>
-        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="moderateThinness">16.0 - 16.9 중등도 저체중</button>
-        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="mildThinness">17.0 - 18.4 경도 저체중</button>
-        <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 - 24.9 정상</button>
-        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="overweight">25.0 - 29.9 과체중</button>
-        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="obesity1">30.0 - 34.9 비만 1단계</button>
-        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obesity2">35.0 - 39.9 비만 2단계</button>
-        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="obesity3">≥ 40.0 비만 3단계</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="severeThinness">&lt; 16.0</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="moderateThinness">16.0 - 16.9</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="mildThinness">17.0 - 18.4</button>
+        <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 - 24.9</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="overweight">25.0 - 29.9</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="obesity1">30.0 - 34.9</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obesity2">35.0 - 39.9</button>
+        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="obesity3">≥ 40.0</button>
       </div>
     </article>
   </section>
@@ -729,14 +746,24 @@ function selectRangeButton(selector, preserveComputedValue = false){
   return matchingButton;
 }
 
-function calculateBloodPressure(){
-  const systolic = Number(document.getElementById("systolicBp").value);
-  const diastolic = Number(document.getElementById("diastolicBp").value);
+function numberInInputRange(id){
+  const input = document.getElementById(id);
+  const value = Number(input.value);
+  if(!value || value <= 0) return null;
 
-  if(!systolic || !diastolic || systolic <= 0 || diastolic <= 0){
-    alert("수축기와 이완기 혈압을 올바르게 입력해주세요.");
-    return;
+  const min = input.min ? Number(input.min) : null;
+  const max = input.max ? Number(input.max) : null;
+  if((min !== null && value < min) || (max !== null && value > max)){
+    return null;
   }
+  return value;
+}
+
+function bloodPressureSelection(){
+  const systolic = numberInInputRange("systolicBp");
+  const diastolic = numberInInputRange("diastolicBp");
+
+  if(!systolic || !diastolic || systolic <= 0 || diastolic <= 0) return null;
 
   let systolicRange;
   let systolicStatus;
@@ -773,25 +800,50 @@ function calculateBloodPressure(){
     diastolicStatus = "고혈압 위기";
   }
 
-  selectRangeButton(`[data-group="수축기 혈압"][data-bp-range="${systolicRange}"]`, true);
-  selectRangeButton(`[data-group="이완기 혈압"][data-bp-range="${diastolicRange}"]`, true);
-  calculatedBP = `${systolic}/${diastolic}`;
-
-  document.getElementById("bpResult").textContent =
-    `판정 결과: 수축기 ${systolicStatus}, 이완기 ${diastolicStatus} · 해당 범위가 자동 선택되었습니다.`;
+  return {
+    systolic,
+    diastolic,
+    systolicRange,
+    systolicStatus,
+    diastolicRange,
+    diastolicStatus
+  };
 }
 
-function calculateBMI(){
-  const height = Number(document.getElementById("height").value);
-  const weight = Number(document.getElementById("weight").value);
+function applyBloodPressureSelection(selection){
+  selectRangeButton(`[data-group="수축기 혈압"][data-bp-range="${selection.systolicRange}"]`, true);
+  selectRangeButton(`[data-group="이완기 혈압"][data-bp-range="${selection.diastolicRange}"]`, true);
+  calculatedBP = `${selection.systolic}/${selection.diastolic}`;
 
-  if(!height || !weight || height <= 0 || weight <= 0){
-    alert("키와 몸무게를 올바르게 입력해주세요.");
+  document.getElementById("bpResult").textContent =
+    `계산 결과: 수축기 ${selection.systolicStatus}, 이완기 ${selection.diastolicStatus} · 해당 범위가 자동 선택되었습니다.`;
+}
+
+function autoSelectBloodPressure(){
+  const selection = bloodPressureSelection();
+  if(!selection){
+    calculatedBP = "";
     return;
   }
+  applyBloodPressureSelection(selection);
+}
+
+function calculateBloodPressure(){
+  const selection = bloodPressureSelection();
+  if(!selection){
+    alert("수축기와 이완기 혈압을 올바르게 입력해주세요.");
+    return;
+  }
+  applyBloodPressureSelection(selection);
+}
+
+function bmiSelection(){
+  const height = numberInInputRange("height");
+  const weight = numberInInputRange("weight");
+
+  if(!height || !weight || height <= 0 || weight <= 0) return null;
 
   const bmi = weight / ((height / 100) ** 2);
-  calculatedBMI = bmi.toFixed(1);
 
   let range;
   let status;
@@ -821,10 +873,36 @@ function calculateBMI(){
     status = "비만 3단계";
   }
 
-  const matchingButton = document.querySelector(`[data-bmi-range="${range}"]`);
-  if(groups.BMI !== matchingButton) selectOption(matchingButton, true);
+  return {
+    bmi: bmi.toFixed(1),
+    range,
+    status
+  };
+}
+
+function applyBMISelection(selection){
+  calculatedBMI = selection.bmi;
+  selectRangeButton(`[data-bmi-range="${selection.range}"]`, true);
   document.getElementById("bmiResult").textContent =
-    `계산 결과: BMI ${calculatedBMI} (${status}) · 해당 범위가 자동 선택되었습니다.`;
+    `계산 결과: BMI ${calculatedBMI} (${selection.status}) · 해당 범위가 자동 선택되었습니다.`;
+}
+
+function autoSelectBMI(){
+  const selection = bmiSelection();
+  if(!selection){
+    calculatedBMI = "";
+    return;
+  }
+  applyBMISelection(selection);
+}
+
+function calculateBMI(){
+  const selection = bmiSelection();
+  if(!selection){
+    alert("키와 몸무게를 올바르게 입력해주세요.");
+    return;
+  }
+  applyBMISelection(selection);
 }
 
 function hideSaveResult(){
