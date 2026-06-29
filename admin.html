@@ -336,6 +336,39 @@ button:disabled {
   font-size: 13px;
 }
 
+.collapsible-card .card-header {
+  margin-bottom: 0;
+}
+
+.collapsible-card.is-open .card-header {
+  margin-bottom: 18px;
+}
+
+.collapsible-body[hidden] {
+  display: none;
+}
+
+.collapse-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 86px;
+  min-height: 38px;
+  padding: 0 12px;
+  color: #33415d;
+  background: #edf2f8;
+  font-size: 13px;
+}
+
+.collapse-icon {
+  font-size: 12px;
+  transition: transform .16s ease;
+}
+
+.collapse-button[aria-expanded="true"] .collapse-icon {
+  transform: rotate(180deg);
+}
+
 .icon-title {
   display: flex;
   align-items: center;
@@ -472,6 +505,28 @@ tbody tr:last-child td {
 
 .summary-table {
   min-width: 360px;
+}
+
+.section-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.summary-table-wrap {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.database-table-wrap {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.sticky-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .recent-list {
@@ -654,7 +709,7 @@ tbody tr:last-child td {
   </section>
 
   <section class="layout-two">
-    <article class="card">
+    <article id="summaryCard" class="card collapsible-card">
       <div class="card-header">
         <div class="icon-title">
           <span class="icon-box">👥</span>
@@ -663,13 +718,27 @@ tbody tr:last-child td {
             <p>참여자별로 설문에 참여한 날짜 수입니다.</p>
           </div>
         </div>
-        <button class="button-secondary button-small" onclick="loadNameSummary()">새로고침</button>
+        <button
+          id="summaryToggle"
+          class="collapse-button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="summaryContent"
+          onclick="toggleCollapsible('summary')"
+        >
+          <span id="summaryToggleText">보기</span><span class="collapse-icon">▼</span>
+        </button>
       </div>
-      <div class="table-wrap">
-        <table class="summary-table">
-          <thead><tr><th>이름</th><th>설문 참여일</th></tr></thead>
-          <tbody id="summaryBody"><tr><td colspan="2" class="empty">불러오는 중...</td></tr></tbody>
-        </table>
+      <div id="summaryContent" class="collapsible-body" hidden>
+        <div class="section-tools">
+          <button class="button-secondary button-small" onclick="loadNameSummary()">새로고침</button>
+        </div>
+        <div class="table-wrap summary-table-wrap sticky-table">
+          <table class="summary-table">
+            <thead><tr><th>이름</th><th>설문 참여일</th></tr></thead>
+            <tbody id="summaryBody"><tr><td colspan="2" class="empty">보기 버튼을 누르면 불러옵니다.</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </article>
 
@@ -718,7 +787,7 @@ tbody tr:last-child td {
     </div>
   </section>
 
-  <section class="card">
+  <section id="databaseCard" class="card collapsible-card">
     <div class="card-header">
       <div class="icon-title">
         <span class="icon-box">🗄️</span>
@@ -727,28 +796,40 @@ tbody tr:last-child td {
           <p>SQLite에 저장된 원본 설문 결과를 최신 순으로 확인합니다.</p>
         </div>
       </div>
+      <button
+        id="databaseToggle"
+        class="collapse-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="databaseContent"
+        onclick="toggleCollapsible('database')"
+      >
+        <span id="databaseToggleText">보기</span><span class="collapse-icon">▼</span>
+      </button>
     </div>
 
-    <div class="db-toolbar">
-      <input id="dbFilter" placeholder="이름, 날짜, 점수로 표 필터링" oninput="filterDatabaseRows()">
-      <div class="db-actions">
-        <button class="button-secondary" onclick="loadDatabase()">↻ DB 새로고침</button>
-        <a id="downloadCsv" class="button-link" href="/api/export.csv" download>↓ CSV 다운로드</a>
+    <div id="databaseContent" class="collapsible-body" hidden>
+      <div class="db-toolbar">
+        <input id="dbFilter" placeholder="이름, 날짜, 점수로 표 필터링" oninput="filterDatabaseRows()">
+        <div class="db-actions">
+          <button class="button-secondary" onclick="loadDatabase()">↻ DB 새로고침</button>
+          <a id="downloadCsv" class="button-link" href="/api/export.csv" download>↓ CSV 다운로드</a>
+        </div>
       </div>
-    </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>이름</th><th>날짜</th><th>총점</th><th>흡연</th>
-            <th>걸음수</th><th>LDL</th><th>혈압</th><th>BMI</th><th>등록시각</th>
-          </tr>
-        </thead>
-        <tbody id="dbBody"><tr><td colspan="10" class="empty">데이터베이스를 불러오는 중...</td></tr></tbody>
-      </table>
+      <div class="table-wrap database-table-wrap sticky-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>날짜</th><th>총점</th><th>흡연</th>
+              <th>걸음수</th><th>LDL</th><th>혈압</th><th>BMI</th><th>등록시각</th>
+            </tr>
+          </thead>
+          <tbody id="dbBody"><tr><td colspan="10" class="empty">보기 버튼을 누르면 불러옵니다.</td></tr></tbody>
+        </table>
+      </div>
+      <div id="dbCount" class="table-meta"></div>
     </div>
-    <div id="dbCount" class="table-meta"></div>
   </section>
 
   <p class="footer-note">데이터는 연결된 SQLite 데이터베이스에서 실시간으로 조회됩니다.</p>
@@ -761,6 +842,10 @@ const API_BASE = window.location.protocol === "file:"
 
 let currentData = [];
 let databaseRows = [];
+let loadedSections = {
+  summary: false,
+  database: false
+};
 let chart;
 let surveyQr;
 
@@ -798,6 +883,50 @@ function emptyRow(columns, message){
 function showError(error){
   console.error(error);
   alert(error.message || "데이터를 불러오지 못했습니다.");
+}
+
+function setSummaryStats(summary){
+  document.getElementById("statTotal").textContent = (summary.totalCount ?? 0).toLocaleString();
+  document.getElementById("statParticipants").textContent = (summary.participantCount ?? 0).toLocaleString();
+  document.getElementById("statAverage").textContent = summary.averageScore ?? "-";
+  document.getElementById("statLatest").textContent = summary.latestDate || "-";
+}
+
+async function loadSummaryStats(){
+  try{
+    const json = await getJson("/api/results-summary");
+    setSummaryStats(json.summary || {});
+  }catch(error){
+    showError(error);
+  }
+}
+
+function setCollapsibleState(section, expanded){
+  const card = document.getElementById(`${section}Card`);
+  const content = document.getElementById(`${section}Content`);
+  const toggle = document.getElementById(`${section}Toggle`);
+  const toggleText = document.getElementById(`${section}ToggleText`);
+
+  card.classList.toggle("is-open", expanded);
+  content.hidden = !expanded;
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggleText.textContent = expanded ? "닫기" : "보기";
+}
+
+async function toggleCollapsible(section){
+  const content = document.getElementById(`${section}Content`);
+  const shouldOpen = content.hidden;
+  setCollapsibleState(section, shouldOpen);
+
+  if(!shouldOpen || loadedSections[section]){
+    return;
+  }
+
+  if(section === "summary"){
+    await loadNameSummary();
+  }else if(section === "database"){
+    await loadDatabase();
+  }
 }
 
 function surveyPageUrl(){
@@ -880,6 +1009,7 @@ async function loadHealth(){
 
 async function loadNameSummary(){
   const body = document.getElementById("summaryBody");
+  body.innerHTML = emptyRow(2, "참여 현황을 불러오는 중...");
   try{
     const json = await getJson("/api/name-summary");
     const rows = json.data || [];
@@ -890,6 +1020,7 @@ async function loadNameSummary(){
             <td><span class="score-badge">${escapeHtml(row.count)}일</span></td>
           </tr>`).join("")
       : emptyRow(2, "저장된 참여자가 없습니다.");
+    loadedSections.summary = true;
   }catch(error){
     body.innerHTML = emptyRow(2, "참여 현황을 불러오지 못했습니다.");
     showError(error);
@@ -1038,12 +1169,8 @@ async function loadDatabase(){
   try{
     const json = await getJson("/api/results");
     databaseRows = json.data || [];
-    const summary = json.summary || {};
-
-    document.getElementById("statTotal").textContent = (summary.totalCount ?? 0).toLocaleString();
-    document.getElementById("statParticipants").textContent = (summary.participantCount ?? 0).toLocaleString();
-    document.getElementById("statAverage").textContent = summary.averageScore ?? "-";
-    document.getElementById("statLatest").textContent = summary.latestDate || "-";
+    setSummaryStats(json.summary || {});
+    loadedSections.database = true;
 
     filterDatabaseRows();
   }catch(error){
@@ -1062,9 +1189,8 @@ if(API_BASE){
 
 window.addEventListener("DOMContentLoaded", () => {
   loadHealth();
-  loadNameSummary();
+  loadSummaryStats();
   loadRecent();
-  loadDatabase();
 });
 </script>
 </body>

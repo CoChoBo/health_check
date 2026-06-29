@@ -431,6 +431,10 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
                 if not self.require_admin_api():
                     return
                 self.handle_recent_3days()
+            elif path == "/api/results-summary":
+                if not self.require_admin_api():
+                    return
+                self.send_json({"summary": get_database_summary()})
             elif path == "/api/results":
                 if not self.require_admin_api():
                     return

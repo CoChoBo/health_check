@@ -176,6 +176,16 @@ class ServerDatabaseTest(unittest.TestCase):
             payload = json.loads(response.read().decode("utf-8"))
             self.assertEqual(response.status, 200)
             self.assertEqual(payload["summary"]["totalCount"], 0)
+
+            connection.request(
+                "GET",
+                "/api/results-summary",
+                headers={"Cookie": cookie.split(";", 1)[0]},
+            )
+            response = connection.getresponse()
+            payload = json.loads(response.read().decode("utf-8"))
+            self.assertEqual(response.status, 200)
+            self.assertEqual(payload["summary"]["totalCount"], 0)
         finally:
             connection.close()
             http_server.shutdown()
