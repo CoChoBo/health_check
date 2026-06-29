@@ -283,6 +283,23 @@ input:focus {
   gap: 9px;
 }
 
+.bp-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.bp-group-title {
+  margin: 0 0 8px 2px;
+  color: #46546c;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.bp-options .options {
+  grid-template-columns: 1fr;
+}
+
 .option-btn {
   min-height: 49px;
   padding: 10px 13px;
@@ -309,7 +326,7 @@ input:focus {
   box-shadow: 0 7px 18px rgba(57,119,246,.20);
 }
 
-.bmi-calculator {
+.bmi-calculator, .bp-calculator {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 9px;
@@ -338,7 +355,7 @@ input:focus {
   transform: translateY(-1px);
 }
 
-.bmi-result {
+.bmi-result, .bp-result {
   min-height: 20px;
   margin: 0 2px 15px;
   color: #1f7562;
@@ -449,7 +466,10 @@ input:focus {
     padding: 20px;
     border-radius: 17px;
   }
-  .identity-grid, .bmi-calculator {
+  .identity-grid, .bmi-calculator, .bp-calculator {
+    grid-template-columns: 1fr;
+  }
+  .bp-options {
     grid-template-columns: 1fr;
   }
   .progress-panel {
@@ -514,8 +534,9 @@ input:focus {
         <div><h2>흡연 여부</h2><small>현재 흡연 상태를 선택하세요.</small></div>
       </div>
       <div class="options">
-        <button type="button" class="option-btn" data-score="3" data-group="흡연">담배 핀다</button>
-        <button type="button" class="option-btn" data-score="5" data-group="흡연">담배 안 핀다</button>
+        <button type="button" class="option-btn" data-score="1" data-group="흡연">흡연한다</button>
+        <button type="button" class="option-btn" data-score="3" data-group="흡연">과거 흡연했지만 현재 금연중</button>
+        <button type="button" class="option-btn" data-score="5" data-group="흡연">피운 적 없다</button>
       </div>
     </article>
 
@@ -526,10 +547,10 @@ input:focus {
       </div>
       <div class="options">
         <button type="button" class="option-btn" data-score="1" data-group="걸음수">&lt; 2,000</button>
-        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000 - 4,000</button>
-        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000 - 6,000</button>
-        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000 - 8,000</button>
-        <button type="button" class="option-btn" data-score="5" data-group="걸음수">&gt; 8,000</button>
+        <button type="button" class="option-btn" data-score="2" data-group="걸음수">2,000 - 3,999</button>
+        <button type="button" class="option-btn" data-score="3" data-group="걸음수">4,000 - 5,999</button>
+        <button type="button" class="option-btn" data-score="4" data-group="걸음수">6,000 - 7,999</button>
+        <button type="button" class="option-btn" data-score="5" data-group="걸음수">≥ 8,000</button>
       </div>
     </article>
 
@@ -539,25 +560,45 @@ input:focus {
         <div><h2>저밀도 콜레스테롤 (LDL)</h2><small>최근 검사 결과(mg/dL)를 기준으로 선택하세요.</small></div>
       </div>
       <div class="options">
-        <button type="button" class="option-btn" data-score="5" data-group="LDL">&lt; 70</button>
-        <button type="button" class="option-btn" data-score="4" data-group="LDL">70 - 99</button>
-        <button type="button" class="option-btn" data-score="3" data-group="LDL">100 - 129</button>
-        <button type="button" class="option-btn" data-score="2" data-group="LDL">130 - 159</button>
-        <button type="button" class="option-btn" data-score="1" data-group="LDL">≥ 160</button>
+        <button type="button" class="option-btn" data-score="5" data-group="LDL">&lt; 100</button>
+        <button type="button" class="option-btn" data-score="4" data-group="LDL">100 - 129</button>
+        <button type="button" class="option-btn" data-score="3" data-group="LDL">130 - 159</button>
+        <button type="button" class="option-btn" data-score="2" data-group="LDL">160 - 189</button>
+        <button type="button" class="option-btn" data-score="1" data-group="LDL">≥ 190</button>
       </div>
     </article>
 
     <article class="question-card">
       <div class="question-heading">
         <span class="question-number">4</span>
-        <div><h2>혈압</h2><small>수축기와 이완기 혈압 범위를 선택하세요.</small></div>
+        <div><h2>혈압</h2><small>수축기와 이완기 혈압 범위를 각각 선택하세요.</small></div>
       </div>
-      <div class="options">
-        <button type="button" class="option-btn" data-score="5" data-group="혈압">&lt;120 그리고 &lt;80</button>
-        <button type="button" class="option-btn" data-score="4" data-group="혈압">120-139 또는 80-89</button>
-        <button type="button" class="option-btn" data-score="3" data-group="혈압">120-139 그리고 80-89</button>
-        <button type="button" class="option-btn" data-score="2" data-group="혈압">140-159 또는 90-99</button>
-        <button type="button" class="option-btn" data-score="1" data-group="혈압">수축기 ≥160 또는 이완기 ≥100</button>
+      <div class="bp-calculator">
+        <input type="number" id="systolicBp" placeholder="수축기 혈압" min="60" max="260" step="1">
+        <input type="number" id="diastolicBp" placeholder="이완기 혈압" min="30" max="180" step="1">
+        <button type="button" class="button-secondary" onclick="calculateBloodPressure()">혈압 판정</button>
+      </div>
+      <div id="bpResult" class="bp-result"></div>
+      <div class="bp-options">
+        <div>
+          <h3 class="bp-group-title">수축기 혈압 (SBP)</h3>
+          <div class="options">
+            <button type="button" class="option-btn" data-score="2.5" data-group="수축기 혈압" data-bp-range="normal">&lt; 120</button>
+            <button type="button" class="option-btn" data-score="2" data-group="수축기 혈압" data-bp-range="elevated">120 - 129</button>
+            <button type="button" class="option-btn" data-score="1.5" data-group="수축기 혈압" data-bp-range="stage1">130 - 139</button>
+            <button type="button" class="option-btn" data-score="1" data-group="수축기 혈압" data-bp-range="stage2">140 - 180</button>
+            <button type="button" class="option-btn" data-score="0.5" data-group="수축기 혈압" data-bp-range="crisis">&gt; 180</button>
+          </div>
+        </div>
+        <div>
+          <h3 class="bp-group-title">이완기 혈압 (DBP)</h3>
+          <div class="options">
+            <button type="button" class="option-btn" data-score="2.5" data-group="이완기 혈압" data-bp-range="normal">&lt; 80</button>
+            <button type="button" class="option-btn" data-score="1.5" data-group="이완기 혈압" data-bp-range="stage1">80 - 89</button>
+            <button type="button" class="option-btn" data-score="1" data-group="이완기 혈압" data-bp-range="stage2">90 - 120</button>
+            <button type="button" class="option-btn" data-score="0.5" data-group="이완기 혈압" data-bp-range="crisis">&gt; 120</button>
+          </div>
+        </div>
       </div>
     </article>
 
@@ -575,11 +616,14 @@ input:focus {
       <div id="bmiResult" class="bmi-result"></div>
 
       <div class="options">
+        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="severeThinness">&lt; 16.0 심한 저체중</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="moderateThinness">16.0 - 16.9 중등도 저체중</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="mildThinness">17.0 - 18.4 경도 저체중</button>
         <button type="button" class="option-btn" data-score="5" data-group="BMI" data-bmi-range="normal">18.5 - 24.9 정상</button>
-        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="caution">&lt;18.5 또는 25 - 29.9</button>
-        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="over">30 - 34.9</button>
-        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obese">35 - 39.9</button>
-        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="severe">≥ 40</button>
+        <button type="button" class="option-btn" data-score="4" data-group="BMI" data-bmi-range="overweight">25.0 - 29.9 과체중</button>
+        <button type="button" class="option-btn" data-score="3" data-group="BMI" data-bmi-range="obesity1">30.0 - 34.9 비만 1단계</button>
+        <button type="button" class="option-btn" data-score="2" data-group="BMI" data-bmi-range="obesity2">35.0 - 39.9 비만 2단계</button>
+        <button type="button" class="option-btn" data-score="1" data-group="BMI" data-bmi-range="obesity3">≥ 40.0 비만 3단계</button>
       </div>
     </article>
   </section>
@@ -606,11 +650,12 @@ const API_BASE = window.location.protocol === "file:"
   ? "http://127.0.0.1:8000"
   : "";
 
-const groupNames = ["흡연", "걸음수", "LDL", "혈압", "BMI"];
+const groupNames = ["흡연", "걸음수", "LDL", "수축기 혈압", "이완기 혈압", "BMI"];
 const groups = Object.fromEntries(groupNames.map(name => [name, null]));
 const buttons = document.querySelectorAll(".option-btn");
 let rawScore = 0;
 let calculatedBMI = "";
+let calculatedBP = "";
 let resultChart;
 
 function localDateString(){
@@ -621,13 +666,18 @@ function localDateString(){
 
 document.getElementById("surveyDate").value = localDateString();
 
-function selectOption(button, preserveCalculatedBMI = false){
+function selectOption(button, preserveComputedValue = false){
   const groupName = button.dataset.group;
   const previous = groups[groupName];
 
-  if(groupName === "BMI" && !preserveCalculatedBMI){
+  if(groupName === "BMI" && !preserveComputedValue){
     calculatedBMI = "";
     document.getElementById("bmiResult").textContent = "";
+  }
+
+  if((groupName === "수축기 혈압" || groupName === "이완기 혈압") && !preserveComputedValue){
+    calculatedBP = "";
+    document.getElementById("bpResult").textContent = "";
   }
 
   if(previous && previous !== button){
@@ -669,6 +719,68 @@ function updateStars(score){
   });
 }
 
+function selectRangeButton(selector, preserveComputedValue = false){
+  const matchingButton = document.querySelector(selector);
+  if(!matchingButton) return null;
+  const groupName = matchingButton.dataset.group;
+  if(groups[groupName] !== matchingButton) {
+    selectOption(matchingButton, preserveComputedValue);
+  }
+  return matchingButton;
+}
+
+function calculateBloodPressure(){
+  const systolic = Number(document.getElementById("systolicBp").value);
+  const diastolic = Number(document.getElementById("diastolicBp").value);
+
+  if(!systolic || !diastolic || systolic <= 0 || diastolic <= 0){
+    alert("수축기와 이완기 혈압을 올바르게 입력해주세요.");
+    return;
+  }
+
+  let systolicRange;
+  let systolicStatus;
+  if(systolic < 120){
+    systolicRange = "normal";
+    systolicStatus = "정상";
+  }else if(systolic < 130){
+    systolicRange = "elevated";
+    systolicStatus = "주의 혈압";
+  }else if(systolic < 140){
+    systolicRange = "stage1";
+    systolicStatus = "고혈압 1단계";
+  }else if(systolic <= 180){
+    systolicRange = "stage2";
+    systolicStatus = "고혈압 2단계";
+  }else{
+    systolicRange = "crisis";
+    systolicStatus = "고혈압 위기";
+  }
+
+  let diastolicRange;
+  let diastolicStatus;
+  if(diastolic < 80){
+    diastolicRange = "normal";
+    diastolicStatus = "정상";
+  }else if(diastolic < 90){
+    diastolicRange = "stage1";
+    diastolicStatus = "고혈압 1단계";
+  }else if(diastolic <= 120){
+    diastolicRange = "stage2";
+    diastolicStatus = "고혈압 2단계";
+  }else{
+    diastolicRange = "crisis";
+    diastolicStatus = "고혈압 위기";
+  }
+
+  selectRangeButton(`[data-group="수축기 혈압"][data-bp-range="${systolicRange}"]`, true);
+  selectRangeButton(`[data-group="이완기 혈압"][data-bp-range="${diastolicRange}"]`, true);
+  calculatedBP = `${systolic}/${diastolic}`;
+
+  document.getElementById("bpResult").textContent =
+    `판정 결과: 수축기 ${systolicStatus}, 이완기 ${diastolicStatus} · 해당 범위가 자동 선택되었습니다.`;
+}
+
 function calculateBMI(){
   const height = Number(document.getElementById("height").value);
   const weight = Number(document.getElementById("weight").value);
@@ -683,24 +795,30 @@ function calculateBMI(){
 
   let range;
   let status;
-  if(bmi < 18.5){
-    range = "caution";
-    status = "저체중";
+  if(bmi < 16){
+    range = "severeThinness";
+    status = "심한 저체중";
+  }else if(bmi < 17){
+    range = "moderateThinness";
+    status = "중등도 저체중";
+  }else if(bmi < 18.5){
+    range = "mildThinness";
+    status = "경도 저체중";
   }else if(bmi < 25){
     range = "normal";
     status = "정상";
   }else if(bmi < 30){
-    range = "caution";
+    range = "overweight";
     status = "과체중";
   }else if(bmi < 35){
-    range = "over";
+    range = "obesity1";
     status = "비만 1단계";
   }else if(bmi < 40){
-    range = "obese";
+    range = "obesity2";
     status = "비만 2단계";
   }else{
-    range = "severe";
-    status = "고도비만";
+    range = "obesity3";
+    status = "비만 3단계";
   }
 
   const matchingButton = document.querySelector(`[data-bmi-range="${range}"]`);
@@ -804,7 +922,9 @@ async function submitSurvey(){
     smoking: groups["흡연"].textContent.trim(),
     steps: groups["걸음수"].textContent.trim(),
     ldl: groups["LDL"].textContent.trim(),
-    bp: groups["혈압"].textContent.trim(),
+    bp: calculatedBP
+      ? `${calculatedBP} (수축기 ${groups["수축기 혈압"].textContent.trim()}, 이완기 ${groups["이완기 혈압"].textContent.trim()})`
+      : `수축기 ${groups["수축기 혈압"].textContent.trim()}, 이완기 ${groups["이완기 혈압"].textContent.trim()}`,
     bmi: calculatedBMI || groups["BMI"].textContent.trim()
   };
 
@@ -850,8 +970,12 @@ function resetSurvey(){
   document.getElementById("surveyDate").value = localDateString();
   document.getElementById("height").value = "";
   document.getElementById("weight").value = "";
+  document.getElementById("systolicBp").value = "";
+  document.getElementById("diastolicBp").value = "";
+  document.getElementById("bpResult").textContent = "";
   document.getElementById("bmiResult").textContent = "";
   calculatedBMI = "";
+  calculatedBP = "";
 
   Object.keys(groups).forEach(groupName => {
     if(groups[groupName]) groups[groupName].classList.remove("selected");
